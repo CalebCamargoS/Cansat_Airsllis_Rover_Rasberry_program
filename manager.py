@@ -55,16 +55,16 @@ class RoverManager():
 
     def execute_with_gps(self):
 
-        v, w = self.controller.control_with_gps(self.target)
+        v, w = self.controller.control(self.target)
 
         max_w = 2 * self.robot.wheel_radius * min(self.robot.max_left_wheel_speed, self.robot.max_right_wheel_speed) / self.robot.wheel_base_length
         w = max(min(w, max_w), -max_w)
 
-        print("w: %f" %w)
+        print("variable de control: %f" %w)
 
         left_speed, right_speed = self.unicycle_to_differential(v, w)
 
-        print("vl: %f, vr: %f" %(left_speed, right_speed))
+        print("rueda izq: %f, rueda derecha: %f" %(left_speed, right_speed))
 
         left_speed, right_speed = self.ensure_wheel_speeds(left_speed, right_speed, w)
 
@@ -94,25 +94,6 @@ class RoverManager():
 
         return left_speed, right_speed
 
-    def execute(self):
-        v, w = self.controller.control(self.target)
-
-        max_w = 2 * self.robot.wheel_radius * min(self.robot.max_left_wheel_speed, self.robot.max_right_wheel_speed) / self.robot.wheel_base_length
-        w = max(min(w, max_w), -max_w)
-
-        print("w: %f" %w)
-
-        left_speed, right_speed = self.unicycle_to_differential(v, w)
-
-        print("vl: %f, vr: %f" %(left_speed, right_speed))
-
-        left_speed, right_speed = self.ensure_wheel_speeds(left_speed, right_speed, w)
-
-        print("vl: %f, vr: %f" %(left_speed, right_speed))
-
-        self.robot.update_speed(left_speed, right_speed)
-
-        self.update_odometry()
 
 
     def execute_with_filter(self, dt = 0.01, gps_enabled = False):

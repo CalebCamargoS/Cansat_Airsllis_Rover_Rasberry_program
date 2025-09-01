@@ -36,13 +36,15 @@ class PIDController():
         return self.speed, w
 
 
-    def control(self, sphericalTarget):
-        target = sphericalTarget.toENU(self.robot.reference)
-
-        u_x = target[0] - self.robot.x
-        u_y = target[1] - self.robot.y
-
-        target_theta = math.atan2(u_y, u_x)
+    def control(self, target):
+        #target = sphericalTarget.toENU(self.robot.reference)
+        #u_x = target[0] - self.robot.x
+        #u_y = target[1] - self.robot.y
+        #target_theta = math.atan2(u_y, u_x)
+        current_point,_ = self.robot.gps.read()
+        print("posicion actual en formato (lat,long):","(",current_point.latitude,",",current_point.longitude,")")
+        target_theta = current_point.bearingTo(target)
+        target_theta = math.atan2(math.sin(target_theta),math.cos(target_theta))
         current_heading = self.robot.bno055.get_heading_radians()
         current_heading = math.atan2(math.sin(current_heading),math.cos(current_heading))
         #current_heading = self.robot.theta
@@ -50,7 +52,8 @@ class PIDController():
         print("teta bearing",math.degrees(target_theta))
         u_theta = target_theta - current_heading
         print("delta de teta:",math.degrees(u_theta))
-
+        print("Calibration status:")
+        print(self.robot.bno055.get_calibration_status())
         current_error = math.atan2(math.sin(u_theta), math.cos(u_theta))
 
         differential_error = current_error - self.previous_error
