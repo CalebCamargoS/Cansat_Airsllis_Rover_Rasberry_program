@@ -101,12 +101,13 @@ class RoverManager():
 
         max_w = 2 * self.robot.wheel_radius * min(self.robot.max_left_wheel_speed, self.robot.max_right_wheel_speed) / self.robot.wheel_base_length
         w = max(min(w, max_w), -max_w)
-
-        print("w: %f" %w)
+        print("velocidad maxima:",self.robot.max_left_wheel_speed)
+        print("velocidad base", v)
+        print("variable de control: %f" %w)
 
         left_speed, right_speed = self.unicycle_to_differential(v, w)
 
-        print("vl: %f, vr: %f" %(left_speed, right_speed))
+        print("vel_izq: %f, vel_derecha: %f" %(left_speed, right_speed))
 
         left_speed, right_speed = self.ensure_wheel_speeds(left_speed, right_speed, w)
 
