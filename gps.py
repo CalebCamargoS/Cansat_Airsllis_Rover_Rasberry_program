@@ -1,0 +1,99 @@
+
+from serial import Serial
+from sphericalTrigonometry import SphericalPoint
+import time
+
+class GPS:
+    GGA_TYPE = 'GGA'
+
+    def __init__(self, port="/dev/serial0", baud=9600, timeout=1.0):
+        self.port = port
+        self.baud = baud
+        self.timeout = timeout
+
+    def parse_nmea_sentence(self, sentence):
+        parsed_sentence = {}
+        values = sentence.split(',')
+        parsed_sentence['type'] = values[0][3:] if len(values[0]) >= 6 else ""
+
+        if parsed_sentence['type'] == self.GGA_TYPE and len(values) >= 10:
+            # Latitude
+            if values[2]:
+                latitude = int(values[2][:2]) + float(values[2][2:]) / 60.0
+                if values[3] == 'S':
+                    latitude = -latitude
+                parsed_sentence['latitude'] = latitude
+
+            # Longitude
+            if values[4]:
+                longitude = int(values[4][:3]) + float(values[4][3:]) / 60.0
+                if values[5] == 'W':
+                    longitude = -longitude
+                parsed_sentence['longitude'] = longitude
+
+            # Altitude
+            try:
+                parsed_sentence['altitude'] = float(values[9]) if values[9] else None
+            except ValueError:
+                parsed_sentence['altitude'] = None
+
+        return parsed_sentence
+
+    def read(self):
+        serial = Serial(self.port, self.baud, timeout=self.timeout)
+        parsed_sentence = {}
+        while True:
+            try:
+                data = serial.readline()
+                sentence = data.decode('utf-8', errors='ignore').strip()
+                if not sentence.startswith("$"):
+                    continue
+
+                parsed_sentence = self.parse_nmea_sentence(sentence)
+
+                if parsed_sentence.get('type') == self.GGA_TYPE:
+                    break
+            except Exception:
+                print("loading...")
+
+        serial.close()
+
+        lat = parsed_sentence.get('latitude', 0.0)
+        lon = parsed_sentence.get('longitude', 0.0)
+        alt = parsed_sentence.get('altitude', 0.0) or 0.0
+        return SphericalPoint(lat, lon), alt
+
+
+if __name__ == '__main__':
+    gps = GPS(port="/dev/serial0")  
+
+    print("Reading GPS data... (Ctrl+C to stop)")
+    reference_point = None
+
+    while True:
+        try:
+            point, altitude = gps.read()
+            print("(lat,long):","(",point.latitude,",",point.longitude,")")
+            """
+            if reference_point is None:
+                # Primer punto como referencia
+                reference_point = SphericalPoint(point.latitude, point.longitude)
+                ref_alt = altitude
+                print(f"Reference set at Lat={point.latitude:.7f}, Lon={point.longitude:.7f}, Alt={altitude:.2f}m")
+                continue
+            
+            # Convertir a coordenadas locales ENU respecto al punto inicial
+            enu = point.toENU(reference_point)
+            x, y, z = enu[0], enu[1], (altitude - ref_alt)  # z = diferencia de altura
+
+            msg = f"Local ENU -> x={x:.2f} m (East), y={y:.2f} m (North), z={z:.2f} m (Up)"
+            print(msg)
+
+            time.sleep(1)
+            """
+        except KeyboardInterrupt:
+            print("\nStopped by user.")
+            break
+        except Exception as e:
+            print("Error:", e)
+            time.sleep(1)
