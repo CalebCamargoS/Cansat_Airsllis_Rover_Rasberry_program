@@ -149,7 +149,8 @@ if __name__ == "__main__":
     sensor = BNO055(mount_offset=0.0, flipped_x=True)
     while True:
         data = sensor.read()
-        print("Heading:", sensor.get_heading_quaternion(), "°")
+        print("Heading quaternion:", sensor.get_heading_quaternion(), "°")
+        print("Heading normal:", sensor.get_heading(), "°")
         #print("Euler (yaw, roll, pitch):", data["euler"])
         #print("Magnetometer:", data["magnetometer"])
         #print(type(data["magnetometer"]))
