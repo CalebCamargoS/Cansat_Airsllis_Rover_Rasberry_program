@@ -40,16 +40,19 @@ class BNO055:
         # Usa cristal externo y arranca en modo NDOF
         self.sensor.enable_external_crystal = True
         time.sleep(0.1)
+        
         self.sensor.mode = adafruit_bno055.NDOF_MODE
-        time.sleep(0.1)
-
+        time.sleep(0.025)
         # Aplica la declinación magnética por defecto
         self.sensor.declination = BNO055.DEFAULT_DECLINATION
         self.sensor._write_register(0x42, 0b00000110)  # bits: x=0, y=1, z=1
         self.sensor._write_register(0x41, 0x24)  
+        
         # Guarda parámetros de montaje
         self.mount_offset = mount_offset
         self.flipped_x = flipped_x
+        self.sensor.mode = adafruit_bno055.NDOF_MODE
+        time.sleep(0.1)
 
     def get_heading_quaternion_radians(self):
         """
