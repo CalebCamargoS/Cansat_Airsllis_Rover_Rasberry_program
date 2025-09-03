@@ -148,7 +148,16 @@ class Robot():
         self.theta = math.atan2(math.sin(state[2, 0]), math.cos(state[2, 0]))
         self.speed = state[3, 0]
         self.w = state[4, 0]
-
+    def move_forward_with_heading(self, duration=10, speed=0.5):
+        import time
+        start_time = time.time()
+        while time.time() - start_time < duration:
+            self.left_motor.forward(speed)
+            self.right_motor.forward(speed)
+            heading = self.bno055.get_heading()
+            print(f"Current heading: {heading:.2f}°")
+            time.sleep(0.1)
+        self.stop()
 
 if __name__ == "__main__":
 
@@ -216,24 +225,5 @@ if __name__ == "__main__":
     """
     # ...inicialización de robot y sensores como ya tienes...
 
-    # Define el objetivo
-    target = SphericalPoint(-12.02460, -77.047482)  # Cambia por tu objetivo real
-
-    while True:
-        # Obtén la posición actual del GPS
-        current_point, _ = robot.gps.read()  # Asegúrate que tu GPS.read() retorna SphericalPoint como primer elemento
-
-        # Calcula el bearing hacia el objetivo
-        bearing = current_point.bearingTo(target)
-        bearing = math.atan2(math.sin(bearing),math.cos(bearing))
-        bearing_deg = math.degrees(bearing)
-
-        # Lee el heading del BNO055
-        heading_rad = robot.bno055.get_heading_radians()
-        heading_rad = math.atan2(math.sin(heading_rad),math.cos(heading_rad))
-        heading_deg = math.degrees(heading_rad)
-
-        print(f"Bearing hacia objetivo: {bearing:.3f} rad ({bearing_deg:.2f}°)")
-        print(f"Heading BNO055: {heading_rad:.3f} rad ({heading_deg:.2f}°)")
-        print("-" * 40)
-        time.sleep(1)
+    # Simple test: move forward and print heading for 10 seconds
+    robot.move_forward_with_heading(duration=10, speed=0.5)
