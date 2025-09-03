@@ -149,7 +149,6 @@ class Robot():
         self.speed = state[3, 0]
         self.w = state[4, 0]
     def move_forward_with_heading(self, duration=10, speed=0.5):
-        import time
         start_time = time.time()
         while time.time() - start_time < duration:
             self.left_motor.forward(speed)
@@ -226,4 +225,5 @@ if __name__ == "__main__":
     # ...inicialización de robot y sensores como ya tienes...
 
     # Simple test: move forward and print heading for 10 seconds
-    robot.move_forward_with_heading(duration=10, speed=0.5)
+    robot.active_calibration_bno055()
+    robot.move_forward_with_heading(duration=10, speed=1)
