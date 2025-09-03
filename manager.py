@@ -53,27 +53,7 @@ class RoverManager():
         right_speed = (2 * v + w * self.robot.wheel_base_length) / (2 * self.robot.wheel_radius)
         return left_speed, right_speed
 
-    def execute_with_gps(self):
-
-        v, w = self.controller.control(self.target)
-
-        max_w = 2 * self.robot.wheel_radius * min(self.robot.max_left_wheel_speed, self.robot.max_right_wheel_speed) / self.robot.wheel_base_length
-        w = max(min(w, max_w), -max_w)
-
-        print("variable de control: %f" %w)
-
-        left_speed, right_speed = self.unicycle_to_differential(v, w)
-
-        print("rueda izq: %f, rueda derecha: %f" %(left_speed, right_speed))
-
-        left_speed, right_speed = self.ensure_wheel_speeds(left_speed, right_speed, w)
-
-
-        print("vl: %f, vr: %f" %(left_speed, right_speed))
-
-        self.robot.update_speed(left_speed, right_speed)
-
-        self.update_odometry()
+    
 
     def ensure_wheel_speeds(self, left_speed, right_speed, w):
         if( max(left_speed, right_speed) > self.robot.max_speed ):
@@ -101,24 +81,32 @@ class RoverManager():
 
         max_w = 2 * self.robot.wheel_radius * min(self.robot.max_left_wheel_speed, self.robot.max_right_wheel_speed) / self.robot.wheel_base_length
         w = max(min(w, max_w), -max_w)
-        print("velocidad maxima:",self.robot.max_left_wheel_speed)
-        print("velocidad base", v)
-        print("variable de control: %f" %w)
+
+        print("\n" + "="*36)
+        print(f"[CONTROL] Max wheel speed allowed: {self.robot.max_left_wheel_speed}")
+        print(f"[CONTROL] Linear speed (v):        {v:.3f} m/s")
+        print(f"[CONTROL] Max angular control (w): {max_w:.3f} rad/s")
+        print(f"[CONTROL] Angular control (w):     {w:.3f} rad/s")
 
         left_speed, right_speed = self.unicycle_to_differential(v, w)
 
-        print("vel_izq: %f, vel_derecha: %f" %(left_speed, right_speed))
+        print(f"[DIFF]   Raw wheel speeds:   L={left_speed:.3f} rad/s, R={right_speed:.3f} rad/s")
+        max_wheel = max(abs(left_speed), abs(right_speed))
+        if max_wheel > self.robot.max_speed:
+            scale = self.robot.max_speed / max_wheel
+            left_speed *= scale
+            right_speed *= scale
+        #left_speed, right_speed = self.ensure_wheel_speeds(left_speed, right_speed, w)
 
-        left_speed, right_speed = self.ensure_wheel_speeds(left_speed, right_speed, w)
-
-        print("vl: %f, vr: %f" %(left_speed, right_speed))
+        print(f"[DIFF]   Scaled wheel speeds: L={left_speed:.3f} rad/s, R={right_speed:.3f} rad/s")
+        print("="*36 + "\n")
 
         self.robot.update_speed(left_speed, right_speed)
+        
+        #time.sleep(dt)
 
-        time.sleep(dt)
-
-        self.update_odometry()
-
+        #self.update_odometry()
+        """
         print("predict state: ", self.robot.get_state())
 
         self.filter.predict(self.robot.get_state())
@@ -143,4 +131,5 @@ class RoverManager():
         self.robot.set_state(state)
 
         print("update state: ", state)
+        """
 
