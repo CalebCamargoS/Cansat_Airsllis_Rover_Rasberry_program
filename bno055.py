@@ -7,7 +7,35 @@ import busio
 import adafruit_bno055
 
 
+def quaternion_to_yaw(w, x, y, z):
+    # Returns yaw (heading) in radians, tilt-compensated
+    t0 = 2.0 * (w * z + x * y)
+    t1 = 1.0 - 2.0 * (y * y + z * z)
+    yaw = math.atan2(t0, t1)
+    return yaw
+
 class BNO055:
+    def get_heading_quaternion_radians(self):
+        """
+        Returns the tilt-compensated heading (yaw) in radians using quaternion output.
+        """
+        q = self.sensor.quaternion  # (w, x, y, z)
+        if q is None or any(v is None for v in q):
+            return 0.0
+        yaw = quaternion_to_yaw(*q)
+        # Optionally subtract mount_offset (in radians)
+        yaw -= math.radians(self.mount_offset)
+        # Normalize to [-pi, pi]
+        return math.atan2(math.sin(yaw), math.cos(yaw))
+
+    def get_heading_quaternion(self):
+        """
+        Returns the tilt-compensated heading (yaw) in degrees using quaternion output.
+        """
+        yaw = self.get_heading_quaternion_radians()
+        deg = math.degrees(yaw)
+        # Normalize to [0, 360)
+        return deg % 360
     """
     Lectura completa del BNO055 en modo NDOF.
     Incluye corrección por orientación del montaje.
@@ -40,6 +68,13 @@ class BNO055:
         # Guarda parámetros de montaje
         self.mount_offset = mount_offset
         self.flipped_x = flipped_x
+
+    def quaternion_to_yaw(w, x, y, z):
+        # Returns yaw (heading) in radians, tilt-compensated
+        t0 = 2.0 * (w * z + x * y)
+        t1 = 1.0 - 2.0 * (y * y + z * z)
+        yaw = math.atan2(t0, t1)
+        return yaw
 
     def read(self):
         """
@@ -106,7 +141,7 @@ class BNO055:
         euler = self.sensor.euler
         if euler is None or euler[0] is None:
            return 0.0  # Valor por defecto si no hay heading
-        yaw = euler[0] + self.mount_offset
+        yaw = euler[0] - self.mount_offset
         return math.radians(yaw)
     def get_calibration_status(self):
         """
