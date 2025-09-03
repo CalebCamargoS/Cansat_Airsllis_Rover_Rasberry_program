@@ -148,7 +148,7 @@ class BNO055:
         return self.sensor.calibration_status
 
 if __name__ == "__main__":
-    sensor = BNO055(mount_offset=0.0, flipped_x=True)
+    sensor = BNO055(mount_offset=0.0, flipped_x=False)
     while True:
         data = sensor.read()
         print("Heading quaternion:", sensor.get_heading_quaternion(), "°")
