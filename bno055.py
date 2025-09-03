@@ -14,6 +14,7 @@ def quaternion_to_yaw(w, x, y, z):
     yaw = math.atan2(t0, t1)
     return yaw
 
+
 class BNO055:
     
     """
@@ -26,7 +27,7 @@ class BNO055:
     def __init__(self,
                  address: int = 0x28,
                  mount_offset: float = 0.0,
-                 flipped_x: bool = True):
+                 flipped_x: bool = False):
         """
         address: dirección I2C del BNO055
         mount_offset: desfase fijo del montaje, en grados
@@ -44,7 +45,8 @@ class BNO055:
 
         # Aplica la declinación magnética por defecto
         self.sensor.declination = BNO055.DEFAULT_DECLINATION
-
+        self.sensor._write_register(0x42, 0b00000110)  # bits: x=0, y=1, z=1
+        self.sensor._write_register(0x41, 0x24)  
         # Guarda parámetros de montaje
         self.mount_offset = mount_offset
         self.flipped_x = flipped_x
