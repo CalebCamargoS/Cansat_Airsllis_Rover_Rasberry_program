@@ -148,17 +148,19 @@ def main():
                 print("===============================\n")
                 currently_task="GPSControl"
             if currently_task=="GPSControl":
+                start = time.time()
                 print("epoch: %d" %epoch)
                 gps_enabled = (epoch > 0 and (epoch % 100 == 0))
                 rover_manager.execute_with_filter(gps_enabled = gps_enabled)
                 epoch += 1
                 current_point, _ = robot.gps.read()
                 distancia = np.linalg.norm(current_point.toENU(target))
-
                 if distancia <= 5:
                    print("Objetivo alcanzado (dentro de 5 metros)")
                    robot.stop()  # O cambia de estado/tarea
                    currently_task=tasks[0]  # O break, según tu estructura
+                elapsed = time.time() - start
+                time.sleep(max(0, dt - elapsed))
             if currently_task=="CamaraControl":
                 pass
             

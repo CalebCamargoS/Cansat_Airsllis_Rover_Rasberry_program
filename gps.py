@@ -10,6 +10,7 @@ class GPS:
         self.port = port
         self.baud = baud
         self.timeout = timeout
+        self.serial=Serial(port, baud, timeout=timeout)
 
     def parse_nmea_sentence(self, sentence):
         parsed_sentence = {}
@@ -40,11 +41,10 @@ class GPS:
         return parsed_sentence
 
     def read(self):
-        serial = Serial(self.port, self.baud, timeout=self.timeout)
         parsed_sentence = {}
         while True:
             try:
-                data = serial.readline()
+                data = self.serial.readline()
                 sentence = data.decode('utf-8', errors='ignore').strip()
                 if not sentence.startswith("$"):
                     continue

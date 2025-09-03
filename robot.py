@@ -16,11 +16,11 @@ class Robot():
         self.theta = 0
         self.speed = 0
         self.w = 0
-        self.wheel_radius = 0.085
-        self.wheel_base_length = 0.17
-        self.max_left_wheel_speed = 5
-        self.max_right_wheel_speed = 5
-        self.max_speed = 5
+        self.wheel_radius = 0.08
+        self.wheel_base_length = 0.19
+        self.max_left_wheel_speed = 10
+        self.max_right_wheel_speed = 10
+        self.max_speed = 10
 
         self.left_motor = left_motor
         self.right_motor = right_motor
@@ -32,7 +32,7 @@ class Robot():
         self.ina226 = ina226  
 
         self.reference, _ = self.gps.read()
-        self.theta = math.pi / 2 - bno055.get_heading_radians()
+        self.theta = bno055.get_heading_radians()
         self.theta = math.atan2(math.sin(self.theta), math.cos(self.theta))
 
         self.stop()
