@@ -56,7 +56,6 @@ class GPS:
             except Exception:
                 print("loading...")
 
-        serial.close()
 
         lat = parsed_sentence.get('latitude', 0.0)
         lon = parsed_sentence.get('longitude', 0.0)
