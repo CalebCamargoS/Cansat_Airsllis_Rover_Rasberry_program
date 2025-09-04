@@ -111,14 +111,14 @@ def main():
                 sensors_data = calibration.get_values()
                 # Check for landing: both altitudes <10m from reference and low linear acceleration
                 cond_bme = False
-                cond_gps = False
+                #cond_gps = False
                 cond_accel = False
                 epsilon = 0.1
                 # Altitude conditions
                 if sensors_data["environment"]["altitude_bme280"] is not None and abs(sensors_data["environment"]["altitude_bme280"] - alt_ref_bme) < 10:
                     cond_bme = True
-                if sensors_data["gps"]["altitude_gps"] is not None and abs(sensors_data["gps"]["altitude_gps"] - alt_ref_gps) < 10:
-                    cond_gps = True
+                #if sensors_data["gps"]["altitude_gps"] is not None and abs(sensors_data["gps"]["altitude_gps"] - alt_ref_gps) < 10:
+                #    cond_gps = True
                 # Linear acceleration condition (BNO055)
                 lin_accel = None
                 if "bno055" in sensors_data and "linear_acceleration" in sensors_data["bno055"]:
@@ -126,7 +126,7 @@ def main():
                 if lin_accel is not None and all(abs(a) < epsilon for a in lin_accel):
                     cond_accel = True
                 # All conditions must be met
-                if cond_bme and cond_gps and cond_accel:
+                if cond_bme and cond_accel:
                     print("Landing detected (altitude and low acceleration) → Switching to nicrom")
                     currently_task = "nicrom"
 
