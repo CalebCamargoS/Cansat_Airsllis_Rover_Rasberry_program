@@ -62,7 +62,7 @@ def main():
            "GPSControl",
            "CamaraControl"]
     
-    currently_task=tasks[2]
+    currently_task=tasks[0]
     epoch = 0
     try:
         # === Reference altitude measurement ===
@@ -109,15 +109,25 @@ def main():
 
             elif currently_task == "inAir":
                 sensors_data = calibration.get_values()
-                # Check for landing: both altitudes <10m from reference
+                # Check for landing: both altitudes <10m from reference and low linear acceleration
                 cond_bme = False
                 cond_gps = False
+                cond_accel = False
+                epsilon = 0.1
+                # Altitude conditions
                 if sensors_data["environment"]["altitude_bme280"] is not None and abs(sensors_data["environment"]["altitude_bme280"] - alt_ref_bme) < 10:
                     cond_bme = True
                 if sensors_data["gps"]["altitude_gps"] is not None and abs(sensors_data["gps"]["altitude_gps"] - alt_ref_gps) < 10:
                     cond_gps = True
-                if cond_bme and cond_gps:
-                    print("Landing detected → Switching to nicrom")
+                # Linear acceleration condition (BNO055)
+                lin_accel = None
+                if "bno055" in sensors_data and "linear_acceleration" in sensors_data["bno055"]:
+                    lin_accel = sensors_data["bno055"]["linear_acceleration"]
+                if lin_accel is not None and all(abs(a) < epsilon for a in lin_accel):
+                    cond_accel = True
+                # All conditions must be met
+                if cond_bme and cond_gps and cond_accel:
+                    print("Landing detected (altitude and low acceleration) → Switching to nicrom")
                     currently_task = "nicrom"
 
             elif currently_task == "nicrom":
