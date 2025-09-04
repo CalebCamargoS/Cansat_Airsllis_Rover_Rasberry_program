@@ -11,16 +11,23 @@ from controller import PIDController
 from manager import RoverManager
 from sphericalTrigonometry import SphericalPoint
 from calibration import Calibration
+from gpiozero import OutputDevice
 
 def main():
     dt = 0.01   # 100 Hz (puedes ajustar según tu loop)
-    min_altitude_air=10 # altitude to know if the cansat was launched
-    alt_ref=0# referential altitude when it's in the land
+    min_altitude_air = 10  # meters
+    # Reference altitude variables
+    alt_ref_bme = None
+    alt_ref_gps = None
     # === Motores ===
     LEFT_MOTOR_INPUT = (18, 12)
     RIGHT_MOTOR_INPUT = (13, 19)
     left_motor = Motor(LEFT_MOTOR_INPUT[0], LEFT_MOTOR_INPUT[1])
     right_motor = Motor(RIGHT_MOTOR_INPUT[0], RIGHT_MOTOR_INPUT[1])
+
+    # === Nicrom GPIO ===
+    
+    nicrom = OutputDevice(17, active_high=True, initial_value=False)
 
     # === Encoders ===
     LEFT_ENCODER_INPUT = {'hall_sensor_A':27, 'hall_sensor_B': 22, 'ticks_per_revolution': 985}
@@ -58,13 +65,11 @@ def main():
     currently_task=tasks[2]
     epoch = 0
     try:
-        """
-        N_REF = 200  # Número de muestras para referencia
+        # === Reference altitude measurement ===
+        N_REF = 10
         gps_altitudes = []
         bme_altitudes = []
-
-        print("Calculando referencia de altitud...")
-
+        print("Measuring reference altitude (10 samples)...")
         for _ in range(N_REF):
             values = calibration.get_values()
             gps_alt = values["gps"]["altitude_gps"]
@@ -73,19 +78,14 @@ def main():
                 gps_altitudes.append(gps_alt)
             if bme_alt is not None:
                 bme_altitudes.append(bme_alt)
-            time.sleep(0.01)  # 10 ms entre muestras
-
+            time.sleep(0.1)  # 100 ms between samples
         alt_ref_gps = np.mean(gps_altitudes) if gps_altitudes else 0
         alt_ref_bme = np.mean(bme_altitudes) if bme_altitudes else 0
-
-        print(f"Referencia de altitud GPS (media de {len(gps_altitudes)}): {alt_ref_gps:.2f} m")
-        print(f"Referencia de altitud BME280 (media de {len(bme_altitudes)}): {alt_ref_bme:.2f} m")
-        """
+        print(f"Reference GPS altitude (mean of {len(gps_altitudes)}): {alt_ref_gps:.2f} m")
+        print(f"Reference BME280 altitude (mean of {len(bme_altitudes)}): {alt_ref_bme:.2f} m")
         while True:
             if currently_task == "sensorCalibration":
-                conditions = 0
                 sensors_data = calibration.get_values()
-
                 print("\n=== SENSOR CALIBRATION DATA ===")
                 for key, value in sensors_data.items():
                     if isinstance(value, dict):
@@ -96,34 +96,38 @@ def main():
                         print(f"{key}: {value}")
                 print("===============================\n")
 
-                if sensors_data["environment"]["altitude_bme280"] is not None and sensors_data["environment"]["altitude_bme280"] >= min_altitude_air:
-                    conditions += 1
-
-                if sensors_data["gps"]["altitude_gps"] is not None and (sensors_data["gps"]["altitude_gps"] - alt_ref) >= min_altitude_air:
-                    conditions += 1
-
-                if conditions >= 2:
-                    print("Condiciones de lanzamiento detectadas → Cambiando a task: inAir")
+                # Check for launch: both altitudes >10m above reference
+                cond_bme = False
+                cond_gps = False
+                if sensors_data["environment"]["altitude_bme280"] is not None and abs(sensors_data["environment"]["altitude_bme280"] - alt_ref_bme) > 10:
+                    cond_bme = True
+                if sensors_data["gps"]["altitude_gps"] is not None and abs(sensors_data["gps"]["altitude_gps"] - alt_ref_gps) > 10:
+                    cond_gps = True
+                if cond_bme and cond_gps:
+                    print("Launch detected → Switching to inAir")
                     currently_task = "inAir"
 
-            if currently_task=="inAir":
-                #Activar lora
-                conditions = 0
-                sensors_data=calibration.get_values()
-                if sensors_data["environment"]["altitude_bme280"] is not None and sensors_data["environment"]["altitude_bme280"] <= 7:
-                    conditions += 1
-                if sensors_data["gps"]["altitude_gps"] is not None and (sensors_data["gps"]["altitude_gps"] - alt_ref) <= 7:
-                    conditions += 1
-                if conditions >= 2:
-                    print("Condiciones de lanzamiento detectadas → Cambiando a task: inAir")
-                    currently_task = "nicrom"
-            if currently_task=="nicrom":
-                #Activar nicrom
-                
-                
-                #calibrar sensores:
+            elif currently_task == "inAir":
                 sensors_data = calibration.get_values()
+                # Check for landing: both altitudes <10m from reference
+                cond_bme = False
+                cond_gps = False
+                if sensors_data["environment"]["altitude_bme280"] is not None and abs(sensors_data["environment"]["altitude_bme280"] - alt_ref_bme) < 10:
+                    cond_bme = True
+                if sensors_data["gps"]["altitude_gps"] is not None and abs(sensors_data["gps"]["altitude_gps"] - alt_ref_gps) < 10:
+                    cond_gps = True
+                if cond_bme and cond_gps:
+                    print("Landing detected → Switching to nicrom")
+                    currently_task = "nicrom"
 
+            elif currently_task == "nicrom":
+                print("Activating nicrom")
+                nicrom.on()
+                time.sleep(30)
+                nicrom.off()
+                print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
+                # Calibrate sensors (as before)
+                sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
                 for key, value in sensors_data.items():
                     if isinstance(value, dict):
@@ -134,9 +138,7 @@ def main():
                         print(f"{key}: {value}")
                 print("===============================\n")
                 robot.active_calibration_bno055()
-
                 sensors_data = calibration.get_values()
-
                 print("\n=== SENSOR CALIBRATION DATA ===")
                 for key, value in sensors_data.items():
                     if isinstance(value, dict):
@@ -146,22 +148,24 @@ def main():
                     else:
                         print(f"{key}: {value}")
                 print("===============================\n")
-                currently_task="GPSControl"
-            if currently_task=="GPSControl":
+                currently_task = "GPSControl"
+
+            elif currently_task == "GPSControl":
                 start = time.time()
-                print("epoch: %d" %epoch)
+                print("epoch: %d" % epoch)
                 gps_enabled = (epoch > 0 and (epoch % 100 == 0))
-                rover_manager.execute_with_filter(gps_enabled = gps_enabled)
+                rover_manager.execute_with_filter(gps_enabled=gps_enabled)
                 epoch += 1
                 current_point, _ = robot.gps.read()
                 distancia = np.linalg.norm(current_point.toENU(target))
                 if distancia <= 5:
-                   print("Objetivo alcanzado (dentro de 5 metros)")
-                   robot.stop()  # O cambia de estado/tarea
-                   currently_task=tasks[0]  # O break, según tu estructura
+                    print("Objetivo alcanzado (dentro de 5 metros)")
+                    robot.stop()
+                    currently_task = tasks[0]
                 elapsed = time.time() - start
                 time.sleep(max(0, dt - elapsed))
-            if currently_task=="CamaraControl":
+
+            elif currently_task == "CamaraControl":
                 pass
             
             """
