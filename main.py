@@ -111,36 +111,22 @@ def main():
 
             elif currently_task == "inAir":
                 sensors_data = calibration.get_values()
-                # Check for landing: both altitudes <10m from reference and low linear acceleration
-                cond_bme = False
-                #cond_gps = False
+                # Check for landing: only low linear acceleration (BNO055)
                 cond_accel = False
                 epsilon = 0.1
-                # Altitude condition
-                bme_current = sensors_data["environment"].get("altitude_bme280")
-                bme_diff = None
-                if bme_current is not None:
-                    bme_diff = bme_current - alt_ref_bme
-                    print(f"[Landing check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) < 10:
-                        cond_bme = True
-                #if sensors_data["gps"]["altitude_gps"] is not None and abs(sensors_data["gps"]["altitude_gps"] - alt_ref_gps) < 10:
-                #    cond_gps = True
-                # Linear acceleration condition (BNO055)
                 lin_accel = None
                 if "bno055" in sensors_data and "linear_acceleration" in sensors_data["bno055"]:
                     lin_accel = sensors_data["bno055"]["linear_acceleration"]
-                    # Both conditions must be met
-                    cond_accel = True
-                # All conditions must be met
-                if cond_bme and cond_accel:
-                    print("Landing detected (altitude and low acceleration) → Switching to nicrom")
+                    if lin_accel is not None and all(abs(a) < epsilon for a in lin_accel):
+                        cond_accel = True
+                if cond_accel:
+                    print("Landing detected (low acceleration) → Switching to nicrom")
                     currently_task = "nicrom"
 
             elif currently_task == "nicrom":
                 print("Activating nicrom")
                 nicrom.on()
-                time.sleep(30)
+                time.sleep(40)
                 nicrom.off()
                 print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
                 # Calibrate sensors (as before)
@@ -154,6 +140,7 @@ def main():
                     else:
                         print(f"{key}: {value}")
                 print("===============================\n")
+                time.sleep(10)
                 robot.active_calibration_bno055()
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
