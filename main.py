@@ -96,14 +96,16 @@ def main():
                         print(f"{key}: {value}")
                 print("===============================\n")
 
-                # Check for launch: both altitudes >10m above reference
+                # Check for launch: BME280 altitude >10m above reference
                 cond_bme = False
-                cond_gps = False
-                if sensors_data["environment"]["altitude_bme280"] is not None and abs(sensors_data["environment"]["altitude_bme280"] - alt_ref_bme) > 10:
-                    cond_bme = True
-                if sensors_data["gps"]["altitude_gps"] is not None and abs(sensors_data["gps"]["altitude_gps"] - alt_ref_gps) > 10:
-                    cond_gps = True
-                if cond_bme and cond_gps:
+                bme_current = sensors_data["environment"].get("altitude_bme280")
+                bme_diff = None
+                if bme_current is not None:
+                    bme_diff = bme_current - alt_ref_bme
+                    print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
+                    if abs(bme_diff) > 10:
+                        cond_bme = True
+                if cond_bme:
                     print("Launch detected → Switching to inAir")
                     currently_task = "inAir"
 
@@ -114,16 +116,21 @@ def main():
                 #cond_gps = False
                 cond_accel = False
                 epsilon = 0.1
-                # Altitude conditions
-                if sensors_data["environment"]["altitude_bme280"] is not None and abs(sensors_data["environment"]["altitude_bme280"] - alt_ref_bme) < 10:
-                    cond_bme = True
+                # Altitude condition
+                bme_current = sensors_data["environment"].get("altitude_bme280")
+                bme_diff = None
+                if bme_current is not None:
+                    bme_diff = bme_current - alt_ref_bme
+                    print(f"[Landing check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
+                    if abs(bme_diff) < 10:
+                        cond_bme = True
                 #if sensors_data["gps"]["altitude_gps"] is not None and abs(sensors_data["gps"]["altitude_gps"] - alt_ref_gps) < 10:
                 #    cond_gps = True
                 # Linear acceleration condition (BNO055)
                 lin_accel = None
                 if "bno055" in sensors_data and "linear_acceleration" in sensors_data["bno055"]:
                     lin_accel = sensors_data["bno055"]["linear_acceleration"]
-                if lin_accel is not None and all(abs(a) < epsilon for a in lin_accel):
+                    # Both conditions must be met
                     cond_accel = True
                 # All conditions must be met
                 if cond_bme and cond_accel:
