@@ -103,7 +103,7 @@ def main():
                 if bme_current is not None:
                     bme_diff = bme_current - alt_ref_bme
                     print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) > 10:
+                    if abs(bme_diff) > 6:
                         cond_bme = True
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
@@ -111,6 +111,15 @@ def main():
 
             elif currently_task == "inAir":
                 sensors_data = calibration.get_values()
+                print("\n=== SENSOR CALIBRATION DATA ===")
+                for key, value in sensors_data.items():
+                    if isinstance(value, dict):
+                        print(f"{key.upper()}:")
+                        for subkey, subvalue in value.items():
+                            print(f"   {subkey}: {subvalue}")
+                    else:
+                        print(f"{key}: {value}")
+                print("===============================\n")
                 # Check for landing: only low linear acceleration (BNO055)
                 cond_accel = False
                 epsilon = 0.1
