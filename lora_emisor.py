@@ -29,7 +29,7 @@ def at(ser, cmd, wait=0.25, show=True):
     out = ser.read(ser.in_waiting or 1).decode(errors="ignore")
     time.sleep(0.05)
     out += ser.read(ser.in_waiting or 1).decode(errors="ignore")
-    if show: #print(f"> {cmd}\n{out.strip()}\n")
+    # if show: print(f"> {cmd}\n{out.strip()}\n")
     return out
 
 def psend(ser, text):
@@ -63,12 +63,12 @@ with serial.Serial(PORT, BAUD, timeout=0.2) as s:
     at(s, "AT+NWM=0")
     at(s, f"AT+P2P={P2P}")
    
-    #print("== Emisor BMP280 -> LoRa P2P ==")
+    # print("== Emisor BMP280 -> LoRa P2P ==")
     while True:
         try:
             data = bme280.read()
             payload = f"{data['temperature']}"
-            #print("TX:", payload)
+            # print("TX:", payload)
             psend(s, payload)
             time.sleep(1)
         except KeyboardInterrupt:
