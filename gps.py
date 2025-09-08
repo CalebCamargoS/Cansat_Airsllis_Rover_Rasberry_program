@@ -53,8 +53,8 @@ class GPS:
 
                 if parsed_sentence.get('type') == self.GGA_TYPE:
                     break
-            except Exception:
-                print("loading...")
+            except Exception as e:
+                print("GPS read error:", e)
 
 
         lat = parsed_sentence.get('latitude', 0.0)
