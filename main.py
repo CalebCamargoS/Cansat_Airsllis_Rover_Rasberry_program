@@ -1,4 +1,5 @@
 import time
+import subprocess
 from gpiozero import Motor
 import numpy as np
 from robot import Robot
@@ -64,24 +65,20 @@ def main():
     
     currently_task=tasks[0]
     epoch = 0
+    secondary_started = False
+    secondary_proc = None
     try:
         # === Reference altitude measurement ===
         N_REF = 10
-        gps_altitudes = []
         bme_altitudes = []
         print("Measuring reference altitude (10 samples)...")
         for _ in range(N_REF):
             values = calibration.get_values()
-            gps_alt = values["gps"]["altitude_gps"]
             bme_alt = values["environment"]["altitude_bme280"]
-            if gps_alt is not None:
-                gps_altitudes.append(gps_alt)
             if bme_alt is not None:
                 bme_altitudes.append(bme_alt)
             time.sleep(0.1)  # 100 ms between samples
-        alt_ref_gps = np.mean(gps_altitudes) if gps_altitudes else 0
         alt_ref_bme = np.mean(bme_altitudes) if bme_altitudes else 0
-        print(f"Reference GPS altitude (mean of {len(gps_altitudes)}): {alt_ref_gps:.2f} m")
         print(f"Reference BME280 altitude (mean of {len(bme_altitudes)}): {alt_ref_bme:.2f} m")
         while True:
             if currently_task == "sensorCalibration":
@@ -108,6 +105,13 @@ def main():
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
                     currently_task = "inAir"
+                    if not secondary_started:
+                        try:
+                            secondary_proc = subprocess.Popen(["python3", "secondary_task.py"])  # ejecutar en paralelo
+                            secondary_started = True
+                            print("[INFO] Proceso secundario 'secondary_task.py' iniciado en paralelo.")
+                        except Exception as e:
+                            print(f"[ERROR] No se pudo iniciar secondary_task.py: {e}")
 
             elif currently_task == "inAir":
                 sensors_data = calibration.get_values()
@@ -203,6 +207,14 @@ def main():
     except KeyboardInterrupt:
         print("\n🛑 Misión interrumpida por el usuario.")
         robot.update_speed(0, 0)
+        if secondary_proc and secondary_proc.poll() is None:
+            print("Cerrando proceso secundario...")
+            secondary_proc.terminate()
+            try:
+                secondary_proc.wait(timeout=5)
+            except Exception:
+                pass
+
 
 
 if __name__ == "__main__":
