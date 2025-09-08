@@ -41,6 +41,9 @@ def truncate_value(key, value):
         if any(x in key for x in ["latitude", "longitude"]):
             return round(value, 5)
         return round(value, 2)
+    # Si es una tupla, trunca cada elemento
+    if isinstance(value, tuple):
+        return tuple(truncate_value(key, v) for v in value)
     return value
 # --- Main ---
 with serial.Serial(PORT, BAUD, timeout=0.2) as s:
@@ -72,6 +75,8 @@ with serial.Serial(PORT, BAUD, timeout=0.2) as s:
                     max_len = 180
                     if len(payload) > max_len:
                         payload = payload[:max_len]
+                    # Eliminar espacios en tuplas para compactar
+                    payload = payload.replace(', ', ',')
                     psend(s, payload)
             time.sleep(1)
         except KeyboardInterrupt:
