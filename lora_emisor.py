@@ -24,13 +24,11 @@ P2P  = "915000000:7:0:0:16:20"   # Igual que en el receptor
 
 # --- Funciones ---
 def at(ser, cmd, wait=0.25, show=True):
-    ser.write((cmd + "\r\n").encode()); ser.flush()
+    ser.write((cmd + "\r\n").encode())
+    ser.flush()
     time.sleep(wait)
-    out = ser.read(ser.in_waiting or 1).decode(errors="ignore")
-    time.sleep(0.05)
-    out += ser.read(ser.in_waiting or 1).decode(errors="ignore")
-    # if show: print(f"> {cmd}\n{out.strip()}\n")
-    return out
+    # No leer ni decodificar respuesta
+    return None
 
 def psend(ser, text):
     hexpl = binascii.hexlify(text.encode("utf-8")).decode()
