@@ -100,7 +100,7 @@ def main():
                 if bme_current is not None:
                     bme_diff = bme_current - alt_ref_bme
                     print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) > 6:
+                    if abs(bme_diff) > 0:
                         cond_bme = True
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
@@ -139,7 +139,7 @@ def main():
             elif currently_task == "nicrom":
                 print("Activating nicrom")
                 nicrom.on()
-                time.sleep(40)
+                time.sleep(5)
                 nicrom.off()
                 print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
                 # Calibrate sensors (as before)
