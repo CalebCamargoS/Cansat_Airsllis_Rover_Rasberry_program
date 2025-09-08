@@ -13,7 +13,27 @@ from manager import RoverManager
 from sphericalTrigonometry import SphericalPoint
 from calibration import Calibration
 from gpiozero import OutputDevice
+import os
+def flatten_dict(d, parent_key='', sep='_'):
+    items = []
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.extend(flatten_dict(v, new_key, sep=sep))
+        else:
+            items.append((new_key, v))
+    return items
 
+def truncate_value(key, value):
+    if isinstance(value, float):
+        if any(x in key for x in ["temperature", "pres", "hum"]):
+            return round(value, 1)
+        if any(x in key for x in ["latitude", "longitude"]):
+            return round(value, 5)
+        return round(value, 2)
+    return value
+
+DATA_FILE = "data_to_send.txt"
 def main():
     dt = 0.01   # 100 Hz (puedes ajustar según tu loop)
     min_altitude_air = 10  # meters
@@ -80,6 +100,7 @@ def main():
             time.sleep(0.1)  # 100 ms between samples
         alt_ref_bme = np.mean(bme_altitudes) if bme_altitudes else 0
         print(f"Reference BME280 altitude (mean of {len(bme_altitudes)}): {alt_ref_bme:.2f} m")
+        
         while True:
             if currently_task == "sensorCalibration":
                 sensors_data = calibration.get_values()
@@ -105,6 +126,7 @@ def main():
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
                     currently_task = "inAir"
+                    """
                     if not secondary_started:
                         try:
                             secondary_proc = subprocess.Popen(["python3", "lora_emisor.py"])  # ejecutar en paralelo
@@ -112,7 +134,7 @@ def main():
                             print("[INFO] Proceso secundario 'lora_emisor.py' iniciado en paralelo.")
                         except Exception as e:
                             print(f"[ERROR] No se pudo iniciar lora_emisor.py: {e}")
-
+                    """
             elif currently_task == "inAir":
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
@@ -185,25 +207,15 @@ def main():
             elif currently_task == "CamaraControl":
                 pass
             
-            """
-            print(f"\nEpoch: {epoch}")
-
-            # Activamos GPS cada 100 ciclos
-            gps_enabled = (epoch > 0 and (epoch % 100 == 0))
-
-            # Ejecutamos la misión (esta maneja los 5 tasks)
-            mission.run(gps_enabled)
-
-            # Lecturas extra de sensores ambientales/energía
-            temp, press, hum = bme280.read_data()
-            voltage = ina226.read_bus_voltage()
-            print(f"[BME280] T={temp:.2f}°C, P={press:.2f}hPa, H={hum:.2f}%")
-            print(f"[INA226] Vbat={voltage:.3f} V")
-
-            # Delay para mantener frecuencia de loop
+            sensors_data = calibration.get_values()
+            flat = flatten_dict(sensors_data)
+            values = [truncate_value(k, v) for k, v in flat]
+            str_values = [str(v) for v in values]
+            csv_payload = ','.join(str_values)
+            with open("data_to_send.txt", 'w') as f:
+                f.write(csv_payload + '\n')
             time.sleep(dt)
             epoch += 1
-            """
     except KeyboardInterrupt:
         print("\n🛑 Misión interrumpida por el usuario.")
         robot.update_speed(0, 0)

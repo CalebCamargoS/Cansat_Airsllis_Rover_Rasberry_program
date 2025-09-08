@@ -55,54 +55,26 @@ with serial.Serial(PORT, BAUD, timeout=0.2) as s:
     lora_reset.on()
     time.sleep(0.1)
 
-    # === Encoders ===
-    LEFT_ENCODER_INPUT = {'hall_sensor_A':27, 'hall_sensor_B': 22, 'ticks_per_revolution': 985}
-    RIGHT_ENCODER_INPUT = {'hall_sensor_A': 5, 'hall_sensor_B': 6, 'ticks_per_revolution': 985}
-    left_encoder = QuadratureEncoder(
-        LEFT_ENCODER_INPUT['hall_sensor_A'],
-        LEFT_ENCODER_INPUT['hall_sensor_B'],
-        LEFT_ENCODER_INPUT['ticks_per_revolution']
-    )
-    right_encoder = QuadratureEncoder(
-        RIGHT_ENCODER_INPUT['hall_sensor_A'],
-        RIGHT_ENCODER_INPUT['hall_sensor_B'],
-        RIGHT_ENCODER_INPUT['ticks_per_revolution']
-    )
-
-    gps = GPS()
-    bno055 = BNO055()
-    bme280 = BME280Sensor()
-    ina226 = INA226Sensor()
-
-    robot = Robot(None, None, left_encoder, right_encoder, gps, bno055, bme280, ina226)
-    calibration = Calibration(robot)
-
+    import os
+    DATA_FILE = "data_to_send.txt"
     # Configurar módulo en P2P
     at(s, "AT")
     at(s, "AT+PRECV=0", show=False)
     at(s, "AT+NWM=0")
     at(s, f"AT+P2P={P2P}")
 
-    # Bucle principal
+    # Bucle principal: lee el archivo y envía la última línea
     while True:
         try:
-            data = calibration.get_values()
-            flat = flatten_dict(data)
-            # Truncar valores y armar CSV
-            values = [truncate_value(k, v) for k, v in flat]
-            # Convertir a string y limitar tamaño (LoRa típico: 51-100 bytes)
-            str_values = [str(v) for v in values]
-            csv_payload = ','.join(str_values)
-            # Si es muy largo, recortar (opcional: solo los primeros N campos)
-            max_len = 90  # Ajusta según tu SF y payload permitido
-            if len(csv_payload) > max_len:
-                # Recorta campos hasta que quepa
-                for i in range(len(str_values), 0, -1):
-                    test_payload = ','.join(str_values[:i])
-                    if len(test_payload) <= max_len:
-                        csv_payload = test_payload
-                        break
-            psend(s, csv_payload)
+            if os.path.exists(DATA_FILE):
+                with open(DATA_FILE, 'r') as f:
+                    lines = f.readlines()
+                if lines:
+                    payload = lines[-1].strip()
+                    max_len = 90
+                    if len(payload) > max_len:
+                        payload = payload[:max_len]
+                    psend(s, payload)
             time.sleep(1)
         except KeyboardInterrupt:
             break
