@@ -212,8 +212,8 @@ def main():
             
             sensors_data = calibration.get_values()
             flat = flatten_dict(sensors_data)
-            # Excluir claves que contienen 'encoder'
-            filtered = [(k, v) for k, v in flat if 'encoders' not in k.lower()]
+            # Excluir claves que contienen 'encoder' (singular o plural)
+            filtered = [(k, v) for k, v in flat if 'encoder' not in k.lower()]
             values = [truncate_value(k, v) for k, v in filtered]
             str_values = [str(v) for v in values]
             csv_payload = ','.join(str_values)
