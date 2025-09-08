@@ -71,7 +71,7 @@ with serial.Serial(PORT, BAUD, timeout=0.2) as s:
                     lines = f.readlines()
                 if lines:
                     payload = lines[-1].strip()
-                    max_len = 90
+                    max_len = 180
                     if len(payload) > max_len:
                         payload = payload[:max_len]
                     psend(s, payload)
