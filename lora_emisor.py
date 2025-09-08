@@ -71,12 +71,42 @@ with serial.Serial(PORT, BAUD, timeout=0.2) as s:
                 with open(DATA_FILE, 'r') as f:
                     lines = f.readlines()
                 if lines:
-                    payload = lines[-1].strip()
+                    # Procesar y truncar los valores de las tuplas correctamente
+                    raw = lines[-1].strip()
+                    # Convertir string CSV a lista de valores
+                    import ast
+                    def process_value(val):
+                        try:
+                            v = ast.literal_eval(val)
+                            if isinstance(v, tuple):
+                                # Truncar cada elemento
+                                return '(' + ','.join(f'{(round(x,5) if i<2 and k in ["latitude","longitude"] else round(x,2)) if isinstance(x,float) else x}' for i, x in enumerate(v)) + ')'
+                            return round(v,5) if k in ["latitude","longitude"] and isinstance(v,float) else (round(v,2) if isinstance(v,float) else v)
+                        except:
+                            return val
+                    # Reconstruir el payload truncando tuplas
+                    values = raw.split(',')
+                    new_values = []
+                    for v in values:
+                        v = v.strip()
+                        if v.startswith('(') and v.endswith(')'):
+                            # Truncar cada elemento de la tupla
+                            try:
+                                t = ast.literal_eval(v)
+                                t2 = tuple(round(x,2) if isinstance(x,float) else x for x in t)
+                                new_values.append(str(t2).replace(' ',''))
+                            except:
+                                new_values.append(v)
+                        else:
+                            try:
+                                f = float(v)
+                                new_values.append(f'{f:.5f}' if len(new_values)<2 else f'{f:.2f}')
+                            except:
+                                new_values.append(v)
+                    payload = ','.join(new_values)
                     max_len = 180
                     if len(payload) > max_len:
                         payload = payload[:max_len]
-                    # Eliminar espacios en tuplas para compactar
-                    payload = payload.replace(', ', ',')
                     psend(s, payload)
             time.sleep(1)
         except KeyboardInterrupt:
