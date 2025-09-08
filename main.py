@@ -122,7 +122,7 @@ def main():
                 print("===============================\n")
                 # Check for landing: only low linear acceleration (BNO055)
                 cond_accel = False
-                epsilon = 0.1
+                epsilon = 0.2
                 lin_accel = None
                 if "bno055" in sensors_data and "linear_acceleration" in sensors_data["bno055"]:
                     lin_accel = sensors_data["bno055"]["linear_acceleration"]
