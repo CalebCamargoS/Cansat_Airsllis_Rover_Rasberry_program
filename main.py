@@ -126,7 +126,7 @@ def main():
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
                     currently_task = "inAir"
-                    """
+                    
                     if not secondary_started:
                         try:
                             secondary_proc = subprocess.Popen(["python3", "lora_emisor.py"])  # ejecutar en paralelo
@@ -134,7 +134,7 @@ def main():
                             print("[INFO] Proceso secundario 'lora_emisor.py' iniciado en paralelo.")
                         except Exception as e:
                             print(f"[ERROR] No se pudo iniciar lora_emisor.py: {e}")
-                    """
+                    
             elif currently_task == "inAir":
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
