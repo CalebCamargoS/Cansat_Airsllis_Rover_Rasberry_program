@@ -38,8 +38,6 @@ def flatten_dict(d, parent_key='', sep='_'):
 # Truncar decimales según tipo de dato
 def truncate_value(key, value):
     if isinstance(value, float):
-        if any(x in key for x in ["temperature", "pres", "hum"]):
-            return round(value, 1)
         if any(x in key for x in ["latitude", "longitude"]):
             return round(value, 5)
         return round(value, 2)
