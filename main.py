@@ -212,7 +212,9 @@ def main():
             
             sensors_data = calibration.get_values()
             flat = flatten_dict(sensors_data)
-            values = [truncate_value(k, v) for k, v in flat]
+            # Excluir claves que contienen 'encoder'
+            filtered = [(k, v) for k, v in flat if 'encoder' not in k.lower()]
+            values = [truncate_value(k, v) for k, v in filtered]
             str_values = [str(v) for v in values]
             csv_payload = ','.join(str_values)
             with open("data_to_send.txt", 'w') as f:
