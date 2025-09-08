@@ -25,12 +25,15 @@ def flatten_dict(d, parent_key='', sep='_'):
     return items
 
 def truncate_value(key, value):
+    # Latitud / longitud => 5 decimales
     if isinstance(value, float):
-        if any(x in key for x in ["temperature", "pres", "hum"]):
-            return round(value, 1)
         if any(x in key for x in ["latitude", "longitude"]):
             return round(value, 5)
-        return round(value, 2)
+        # Cualquier otro float => 1 decimal
+        return round(value, 1)
+    # Tuplas => cada elemento a 1 decimal si es float
+    if isinstance(value, tuple):
+        return tuple(round(v, 1) if isinstance(v, float) else v for v in value)
     return value
 
 DATA_FILE = "data_to_send.txt"

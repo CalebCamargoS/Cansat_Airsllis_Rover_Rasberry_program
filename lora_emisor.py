@@ -40,7 +40,7 @@ def truncate_value(key, value):
     if isinstance(value, float):
         if any(x in key for x in ["latitude", "longitude"]):
             return round(value, 5)
-        return round(value, 2)
+        return round(value, 1)
     # Si es una tupla, trunca cada elemento
     if isinstance(value, tuple):
         return tuple(truncate_value(key, v) for v in value)
