@@ -107,11 +107,11 @@ def main():
                     currently_task = "inAir"
                     if not secondary_started:
                         try:
-                            secondary_proc = subprocess.Popen(["python3", "secondary_task.py"])  # ejecutar en paralelo
+                            secondary_proc = subprocess.Popen(["python3", "lora_emisor.py"])  # ejecutar en paralelo
                             secondary_started = True
-                            print("[INFO] Proceso secundario 'secondary_task.py' iniciado en paralelo.")
+                            print("[INFO] Proceso secundario 'lora_emisor.py' iniciado en paralelo.")
                         except Exception as e:
-                            print(f"[ERROR] No se pudo iniciar secondary_task.py: {e}")
+                            print(f"[ERROR] No se pudo iniciar lora_emisor.py: {e}")
 
             elif currently_task == "inAir":
                 sensors_data = calibration.get_values()
