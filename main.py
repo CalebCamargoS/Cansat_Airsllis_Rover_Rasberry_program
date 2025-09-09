@@ -94,7 +94,7 @@ def main():
         # Lanzar gps.py en segundo plano para que actualice gps_data.txt
         gps_proc = subprocess.Popen(["python3", "gps.py"])
         # === Reference altitude measurement ===
-        N_REF = 4
+        N_REF = 1
         bme_altitudes = []
         print("Measuring reference altitude (10 samples)...")
         for _ in range(N_REF):
