@@ -98,7 +98,7 @@ class GPS:
         if self._thread.is_alive():
             self._thread.join()
 
-
+"""
 if __name__ == '__main__':
     gps = GPS(port="/dev/serial0")
     gps.debug = True  # activar logs internos si quieres
@@ -117,4 +117,4 @@ if __name__ == '__main__':
         print("\nFin prueba GPS")
     finally:
         gps.stop()
-            
+"""          
