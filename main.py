@@ -92,7 +92,7 @@ def main():
     secondary_proc = None
     try:
         # === Reference altitude measurement ===
-        N_REF = 1
+        N_REF = 5
         bme_altitudes = []
         print("Measuring reference altitude (10 samples)...")
         for _ in range(N_REF):
@@ -125,7 +125,7 @@ def main():
                 if bme_current is not None:
                     bme_diff = bme_current - alt_ref_bme
                     print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) > 6 :
+                    if abs(bme_diff) > 0 :
                         cond_bme = True
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
@@ -217,7 +217,7 @@ def main():
 
             elif currently_task == "CamaraControl":
                 pass
-            """
+            
             sensors_data = calibration.get_values()
             flat = flatten_dict(sensors_data)
             # Excluir claves que contienen 'encoder' (singular o plural)
@@ -228,8 +228,8 @@ def main():
             with open("data_to_send.txt", 'w') as f:
                 f.write(csv_payload + '\n')
             time.sleep(dt)
-            epoch += 1
-            """
+            
+            
     except KeyboardInterrupt:
         print("\n🛑 Misión interrumpida por el usuario.")
         robot.update_speed(0, 0)
