@@ -103,6 +103,7 @@ def main():
             if bme_alt is not None:
                 bme_altitudes.append(bme_alt)
             time.sleep(0.1)  # 100 ms between samples
+            print(".")
         alt_ref_bme = np.mean(bme_altitudes) if bme_altitudes else 0
         print(f"Reference BME280 altitude (mean of {len(bme_altitudes)}): {alt_ref_bme:.2f} m")
         

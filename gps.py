@@ -73,7 +73,7 @@ class GPS:
 if __name__ == '__main__':
     gps = GPS(port="/dev/serial0")  
 
-    print("Reading GPS data... (Ctrl+C to stop)")
+    #print("Reading GPS data... (Ctrl+C to stop)")
     reference_point = None
 
     while True:
