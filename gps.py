@@ -59,8 +59,6 @@ class GPS:
         lat = parsed_sentence.get('latitude', 0.0)
         lon = parsed_sentence.get('longitude', 0.0)
         alt = parsed_sentence.get('altitude', 0.0) or 0.0
-
-        # Guardar en gps_data.txt
         try:
             with open("gps_data.txt", "w") as f:
                 f.write(f"{lat},{lon}\n")
