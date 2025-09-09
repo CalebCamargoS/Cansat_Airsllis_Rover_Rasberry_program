@@ -86,7 +86,7 @@ class Robot():
     def get_battery_status(self):#ok
         return self.ina226.read_voltage()
     
-    def active_calibration_bno055(self, timeout=120, speed=0.3):
+    def active_calibration_bno055(self, timeout=120, speed=0.5):
         """
         Ejecuta un movimiento en forma de '8' hasta que el BNO055 esté calibrado.
         speed: velocidad normalizada (0.0 - 1.0)
@@ -107,14 +107,18 @@ class Robot():
                 return True
 
             # Movimiento en forma de 8: primero giro a la izquierda, luego a la derecha
-            self.update_speed_normalize(speed, speed /3)   # curva izquierda
-            time.sleep(2)
-            self.update_speed_normalize(speed /3, speed)   # curva derecha
-            time.sleep(2)
             self.update_speed_normalize(speed,speed)
-            time.sleep(2)
+            time.sleep(3)
+            self.update_speed_normalize(speed,-speed)
+            time.sleep(3)
+            self.update_speed_normalize(-speed,speed)
+            time.sleep(3)
             self.update_speed_normalize(-speed,-speed)
-            time.sleep(2)
+            time.sleep(3)
+            self.update_speed_normalize(speed,speed)
+            time.sleep(1)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+            
+            
         # Si no se calibró en el tiempo límite
         self.stop()
         print("\n⚠ Timeout: no se logró calibrar completamente el BNO055.")

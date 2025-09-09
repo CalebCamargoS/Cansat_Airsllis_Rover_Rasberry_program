@@ -91,7 +91,6 @@ def main():
     secondary_started = False
     secondary_proc = None
     try:
-        
         # === Reference altitude measurement ===
         N_REF = 1
         bme_altitudes = []
