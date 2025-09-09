@@ -91,6 +91,8 @@ def main():
     secondary_started = False
     secondary_proc = None
     try:
+        # Lanzar gps.py en segundo plano para que actualice gps_data.txt
+        gps_proc = subprocess.Popen(["python3", "gps.py"])
         # === Reference altitude measurement ===
         N_REF = 10
         bme_altitudes = []

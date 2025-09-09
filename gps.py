@@ -53,13 +53,20 @@ class GPS:
 
                 if parsed_sentence.get('type') == self.GGA_TYPE:
                     break
-            except Exception as e:
-                print("GPS read error:", e)
-
+            except Exception:
+                pass
 
         lat = parsed_sentence.get('latitude', 0.0)
         lon = parsed_sentence.get('longitude', 0.0)
         alt = parsed_sentence.get('altitude', 0.0) or 0.0
+
+        # Guardar en gps_data.txt
+        try:
+            with open("gps_data.txt", "w") as f:
+                f.write(f"{lat},{lon}\n")
+        except Exception:
+            pass
+
         return SphericalPoint(lat, lon), alt
 
 
@@ -72,7 +79,7 @@ if __name__ == '__main__':
     while True:
         try:
             point, altitude = gps.read()
-            print("(lat,long):","(",point.latitude,",",point.longitude,")")
+            #print("(lat,long):","(",point.latitude,",",point.longitude,")")
             """
             if reference_point is None:
                 # Primer punto como referencia
@@ -95,4 +102,4 @@ if __name__ == '__main__':
             break
         except Exception as e:
             print("Error:", e)
-            time.sleep(1)
+            
