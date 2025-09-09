@@ -13,23 +13,12 @@ class PIDController():
 
 
     def control(self, target):
-        # Leer la última posición GPS desde un archivo txt (formato: lat,lon) generado por el proceso de adquisición de GPS
-        
-        gps_file = "gps_data.txt"
-        lat, lon = None, None
-        if os.path.exists(gps_file):
-            with open(gps_file, 'r') as f:
-                line = f.readline().strip()
-                try:
-                    lat, lon = map(float, line.split(','))
-                except Exception:
-                    lat, lon = None, None
-        if lat is None or lon is None:
-            # Si no hay datos, mantener el control anterior (o puedes retornar 0,0)
+        # Usar la última posición GPS disponible en memoria (no bloqueante)
+        current_point = getattr(self.robot.gps, 'last_point', None)
+        if current_point is None or (getattr(current_point, 'latitude', 0.0) == 0.0 and getattr(current_point, 'longitude', 0.0) == 0.0):
+            # Si no hay datos válidos, mantener el control anterior (o puedes retornar 0,0)
             return self.speed, 0.0
 
-        
-        current_point = SphericalPoint(lat, lon)
         target_theta = current_point.bearingTo(target)
         target_theta = math.atan2(math.sin(target_theta), math.cos(target_theta))
         current_heading = self.robot.bno055.get_heading_radians()
