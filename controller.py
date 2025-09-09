@@ -5,8 +5,8 @@ class PIDController():
     def __init__(self, robot):
         self.robot = robot
         self.speed = 0.5
-        self.kp = 5
-        self.ki = 0
+        self.kp = 10
+        self.ki = 0.1
         self.kd = 0
         self.previous_error = 0
         self.integral_error = 0
