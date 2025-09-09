@@ -125,7 +125,7 @@ def main():
                 if bme_current is not None:
                     bme_diff = bme_current - alt_ref_bme
                     print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) > 0 :
+                    if abs(bme_diff) > 6 :
                         cond_bme = True
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
