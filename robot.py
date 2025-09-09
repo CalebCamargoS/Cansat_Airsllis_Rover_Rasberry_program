@@ -101,17 +101,17 @@ class Robot():
             print(f"SYS={sys} GYRO={gyro} ACCEL={accel} MAG={mag}", end="\r")
 
             # Verificar si ya está completamente calibrado
-            if sys >= 2 and gyro >= 2 and accel >= 0 and mag == 3:
+            if sys >= 2 and gyro >= 3 and accel >= 0 and mag == 3:
                 print("\n✅ BNO055 calibrado completamente durante el movimiento!")
                 self.stop()
                 return True
 
             # Movimiento en forma de 8: primero giro a la izquierda, luego a la derecha
             self.update_speed_normalize(speed,speed)
-            time.sleep(3)
-            self.update_speed_normalize(speed,-speed)
-            time.sleep(3)
-            self.update_speed_normalize(-speed,speed)
+            time.sleep(5)
+            self.update_speed_normalize(0,speed)
+            time.sleep(5)
+            self.update_speed_normalize(speed,0)
             time.sleep(3)
             self.update_speed_normalize(-speed,-speed)
             time.sleep(3)
