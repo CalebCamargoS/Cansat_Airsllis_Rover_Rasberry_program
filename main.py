@@ -86,7 +86,7 @@ def main():
            "GPSControl",
            "CamaraControl"]
     
-    currently_task=tasks[2]
+    currently_task=tasks[0]
     epoch = 0
     secondary_started = False
     secondary_proc = None
