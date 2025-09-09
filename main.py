@@ -156,7 +156,12 @@ def main():
                 lin_accel = None
                 if "bno055" in sensors_data and "linear_acceleration" in sensors_data["bno055"]:
                     lin_accel = sensors_data["bno055"]["linear_acceleration"]
-                    if lin_accel is not None and all(abs(a) < epsilon for a in lin_accel):
+                    if (
+                        lin_accel is not None and
+                        isinstance(lin_accel, (list, tuple)) and
+                        all(a is not None for a in lin_accel) and
+                        all(abs(a) < epsilon for a in lin_accel)
+                    ):
                         cond_accel = True
                 if cond_accel:
                     print("Landing detected (low acceleration) → Switching to nicrom")
