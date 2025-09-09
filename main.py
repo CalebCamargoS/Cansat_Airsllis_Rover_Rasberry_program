@@ -211,7 +211,7 @@ def main():
                 """
                 #elapsed = time.time() - start
                 #time.sleep(max(0, dt - elapsed))
-                time.sleep(dt)
+                time.sleep(0.1)
 
             elif currently_task == "CamaraControl":
                 pass
