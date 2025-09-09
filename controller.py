@@ -18,6 +18,7 @@ class PIDController():
         current_point = getattr(self.robot.gps, 'last_point', None)
         if current_point is None or (getattr(current_point, 'latitude', 0.0) == 0.0 and getattr(current_point, 'longitude', 0.0) == 0.0):
             # Si no hay datos válidos, mantener el control anterior (o puedes retornar 0,0)
+            print("⚠ No hay datos GPS válidos. Manteniendo velocidad y giro anteriores.")
             return self.speed, 0.0
 
         target_theta = current_point.bearingTo(target)
