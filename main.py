@@ -171,6 +171,7 @@ def main():
                 #nicrom.off()
                 #print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
                 # Calibrate sensors (as before)
+                """
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
                 for key, value in sensors_data.items():
@@ -181,8 +182,10 @@ def main():
                     else:
                         print(f"{key}: {value}")
                 print("===============================\n")
+                """
                 #time.sleep(10)
                 robot.active_calibration_bno055()
+                """
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
                 for key, value in sensors_data.items():
@@ -193,6 +196,7 @@ def main():
                     else:
                         print(f"{key}: {value}")
                 print("===============================\n")
+                """
                 currently_task = "GPSControl"
 
             elif currently_task == "GPSControl":
@@ -211,7 +215,7 @@ def main():
                 """
                 #elapsed = time.time() - start
                 #time.sleep(max(0, dt - elapsed))
-                time.sleep(0.1)
+                time.sleep(0.5)
 
             elif currently_task == "CamaraControl":
                 pass
