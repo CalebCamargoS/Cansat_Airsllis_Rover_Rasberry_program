@@ -101,7 +101,7 @@ class Robot():
             print(f"SYS={sys} GYRO={gyro} ACCEL={accel} MAG={mag}", end="\r")
 
             # Verificar si ya está completamente calibrado
-            if sys >= 0 and gyro >= 0 and accel >= 0 and mag == 3:
+            if sys >= 2 and gyro >= 2 and accel >= 0 and mag == 3:
                 print("\n✅ BNO055 calibrado completamente durante el movimiento!")
                 self.stop()
                 return True

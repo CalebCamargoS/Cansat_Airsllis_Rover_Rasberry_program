@@ -77,7 +77,7 @@ def main():
     controller = PIDController(robot)
 
  
-    target = SphericalPoint(39.5340208, -119.81502983)
+    target = SphericalPoint(39.533679, -119.814952)
     rover_manager = RoverManager(robot, controller, target)
     calibration=Calibration(robot)
     tasks=["sensorCalibration",
@@ -214,7 +214,7 @@ def main():
                 """
                 #elapsed = time.time() - start
                 #time.sleep(max(0, dt - elapsed))
-                time.sleep(0.5)
+                time.sleep(0.01)
 
             elif currently_task == "CamaraControl":
                 pass

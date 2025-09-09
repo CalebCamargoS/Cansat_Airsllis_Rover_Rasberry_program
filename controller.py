@@ -4,8 +4,8 @@ import os
 class PIDController():
     def __init__(self, robot):
         self.robot = robot
-        self.speed = 0.425
-        self.kp = 0.8
+        self.speed = 0.5
+        self.kp = 5
         self.ki = 0
         self.kd = 0
         self.previous_error = 0
@@ -38,7 +38,7 @@ class PIDController():
             try:
                 print(
                     f"PID | lat={current_point.latitude:.6f} lon={current_point.longitude:.6f} "
-                    f"target_bearing={target_theta:.3f} heading={current_heading:.3f} "
+                    f"target_bearing={math.degrees(target_theta):.3f} heading={math.degrees(current_heading):.3f} "
                     f"err={current_error:.3f} derr={differential_error:.3f} ierr={self.integral_error:.3f} "
                     f"speed={self.speed:.3f} w={w:.3f}"
                 )
