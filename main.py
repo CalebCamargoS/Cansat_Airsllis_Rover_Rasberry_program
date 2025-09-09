@@ -211,7 +211,7 @@ def main():
 
             elif currently_task == "CamaraControl":
                 pass
-            
+            """
             sensors_data = calibration.get_values()
             flat = flatten_dict(sensors_data)
             # Excluir claves que contienen 'encoder' (singular o plural)
@@ -223,6 +223,7 @@ def main():
                 f.write(csv_payload + '\n')
             time.sleep(dt)
             epoch += 1
+            """
     except KeyboardInterrupt:
         print("\n🛑 Misión interrumpida por el usuario.")
         robot.update_speed(0, 0)

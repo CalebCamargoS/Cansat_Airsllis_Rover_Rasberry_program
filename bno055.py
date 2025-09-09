@@ -159,5 +159,5 @@ if __name__ == "__main__":
         print("Accelerometer:", data["acceleration"])
         print("Calibration:", data["calibration"])
         print("----")
-        time.sleep(1)
+        
 
