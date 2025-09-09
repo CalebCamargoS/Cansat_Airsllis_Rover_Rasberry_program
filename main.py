@@ -193,12 +193,12 @@ def main():
                 currently_task = "GPSControl"
 
             elif currently_task == "GPSControl":
-                start = time.time()
+                #start = time.time()
                 print("epoch: %d" % epoch)
-                gps_enabled = (epoch > 0 and (epoch % 100 == 0))
-                rover_manager.execute_with_filter(gps_enabled=gps_enabled)
+                #gps_enabled = (epoch > 0 and (epoch % 100 == 0))
+                rover_manager.execute_with_filter(gps_enabled=False)
                 epoch += 1
-                current_point, _ = robot.gps.read()
+                #current_point, _ = robot.gps.read()
                 #distancia = np.linalg.norm(current_point.toENU(target))
                 """
                 if distancia <= 5:
