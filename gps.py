@@ -15,17 +15,23 @@ class GPS:
         self.last_point = SphericalPoint(0.0, 0.0)
         self.last_alt = 0.0
         self._stop_thread = False
+        self.debug = False  # Cambia a True para ver mensajes de depuración
         self._thread = threading.Thread(target=self._update_loop, daemon=True)
         self._thread.start()
 
     def _update_loop(self):
         while not self._stop_thread:
             try:
-                point, alt = self.read(blocking=True)
-                self.last_point = point
-                self.last_alt = alt
-            except Exception:
-                pass
+                point, alt = self.read()  # antes se pasaba blocking=True (param inexistente) => error silenciado
+                # Actualizar sólo si parece un valor válido (evitar quedarse en 0,0 si todavía no hay fix)
+                if (point.latitude != 0.0 or point.longitude != 0.0):
+                    self.last_point = point
+                    self.last_alt = alt
+                    if self.debug:
+                        print(f"[GPS] Update lat={point.latitude:.6f} lon={point.longitude:.6f} alt={alt:.1f}")
+            except Exception as e:
+                if self.debug:
+                    print(f"[GPS] Error hilo: {e}")
             # No sleep: el GPS es lento por sí mismo
 
     def parse_nmea_sentence(self, sentence):
@@ -69,17 +75,21 @@ class GPS:
 
                 if parsed_sentence.get('type') == self.GGA_TYPE:
                     break
-            except Exception:
-                pass
+            except Exception as e:
+                if self.debug:
+                    print(f"[GPS] Error lectura: {e}")
+                continue
 
         lat = parsed_sentence.get('latitude', 0.0)
         lon = parsed_sentence.get('longitude', 0.0)
         alt = parsed_sentence.get('altitude', 0.0) or 0.0
+        # Escribir último punto (no crítico si falla)
         try:
             with open("gps_data.txt", "w") as f:
                 f.write(f"{lat},{lon}\n")
-        except Exception:
-            pass
+        except Exception as e:
+            if self.debug:
+                print(f"[GPS] Error escribiendo archivo: {e}")
 
         return SphericalPoint(lat, lon), alt
 
