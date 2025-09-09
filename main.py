@@ -162,11 +162,11 @@ def main():
                     currently_task = "nicrom"
 
             elif currently_task == "nicrom":
-                print("Activating nicrom")
-                nicrom.on()
-                time.sleep(5)
-                nicrom.off()
-                print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
+                #print("Activating nicrom")
+                #nicrom.on()
+                #time.sleep(5)
+                #nicrom.off()
+                #print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
                 # Calibrate sensors (as before)
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
@@ -178,7 +178,7 @@ def main():
                     else:
                         print(f"{key}: {value}")
                 print("===============================\n")
-                time.sleep(10)
+                #time.sleep(10)
                 robot.active_calibration_bno055()
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")

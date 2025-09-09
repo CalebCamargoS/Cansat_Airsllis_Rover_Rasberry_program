@@ -49,8 +49,8 @@ class RoverManager():
 
 
     def unicycle_to_differential(self, v, w):
-        left_speed = (2 * v + w * self.robot.wheel_base_length) / (2 * self.robot.wheel_radius)
-        right_speed = (2 * v - w * self.robot.wheel_base_length) / (2 * self.robot.wheel_radius)
+        left_speed = (2 * v - w * self.robot.wheel_base_length) / (2 * self.robot.wheel_radius)
+        right_speed = (2 * v + w * self.robot.wheel_base_length) / (2 * self.robot.wheel_radius)
         return left_speed, right_speed
 
     
