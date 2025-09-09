@@ -116,7 +116,15 @@ class Robot():
             self.update_speed_normalize(-speed,-speed)
             time.sleep(3)
             self.update_speed_normalize(speed,speed)
-            time.sleep(1)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+            time.sleep(1)
+            self.update_speed_normalize(speed, speed*0.3)
+            time.sleep(6)
+            self.update_speed_normalize(0, 0)
+            time.sleep(1)
+            self.update_speed_normalize(speed*0.3, speed)
+            time.sleep(6)
+            self.update_speed_normalize(0, 0)
+            time.sleep(1)
             
             
         # Si no se calibró en el tiempo límite
