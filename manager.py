@@ -98,7 +98,7 @@ class RoverManager():
             right_speed *= scale
         #left_speed, right_speed = self.ensure_wheel_speeds(left_speed, right_speed, w)
 
-        #print(f"[DIFF]   Scaled wheel speeds: L={left_speed:.3f} rad/s, R={right_speed:.3f} rad/s")
+        print(f"[DIFF]   Scaled wheel speeds: L={left_speed:.3f} rad/s, R={right_speed:.3f} rad/s")
         #print("="*36 + "\n")
 
         self.robot.update_speed(left_speed, right_speed)

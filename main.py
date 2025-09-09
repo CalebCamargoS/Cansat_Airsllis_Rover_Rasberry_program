@@ -124,7 +124,7 @@ def main():
                 if bme_current is not None:
                     bme_diff = bme_current - alt_ref_bme
                     print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) > 6git :
+                    if abs(bme_diff) > 6 :
                         cond_bme = True
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
@@ -199,13 +199,15 @@ def main():
                 rover_manager.execute_with_filter(gps_enabled=gps_enabled)
                 epoch += 1
                 current_point, _ = robot.gps.read()
-                distancia = np.linalg.norm(current_point.toENU(target))
+                #distancia = np.linalg.norm(current_point.toENU(target))
+                """
                 if distancia <= 5:
                     print("Objetivo alcanzado (dentro de 5 metros)")
                     robot.stop()
                     currently_task = tasks[0]
-                elapsed = time.time() - start
-                time.sleep(max(0, dt - elapsed))
+                """
+                #elapsed = time.time() - start
+                #time.sleep(max(0, dt - elapsed))
 
             elif currently_task == "CamaraControl":
                 pass
