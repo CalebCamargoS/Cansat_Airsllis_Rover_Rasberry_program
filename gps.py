@@ -89,7 +89,7 @@ class GPS:
                 f.write(f"{lat},{lon}\n")
         except Exception as e:
             if self.debug:
-                print(f"[GPS] Error escribiendo archivo: {e}")
+                pass#print(f"[GPS] Error escribiendo archivo: {e}")
 
         return SphericalPoint(lat, lon), alt
 
@@ -112,7 +112,7 @@ if __name__ == '__main__':
             # Si quieres forzar una lectura inmediata adicional (bloqueante hasta GGA) descomenta:
             # p, a = gps.read()
             # print(f"READ -> lat={p.latitude:.6f} lon={p.longitude:.6f} alt={a:.1f}")
-            time.sleep(1)
+            time.sleep(0.1)
     except KeyboardInterrupt:
         print("\nFin prueba GPS")
     finally:
