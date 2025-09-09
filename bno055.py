@@ -41,14 +41,14 @@ class BNO055:
         self.sensor.enable_external_crystal = True
         time.sleep(0.1)
         
-        self.sensor.mode = adafruit_bno055.NDOF_FMC_OFF
+        self.sensor.mode = "NDOF_FMC_OFF"
         time.sleep(0.025)
         
         
         # Guarda parámetros de montaje
         self.mount_offset = mount_offset
         self.flipped_x = False  # Sensor is now mounted normally
-        self.sensor.mode = adafruit_bno055.NDOF_FMC_OFF
+        self.sensor.mode = "NDOF_FMC_OFF"
         time.sleep(0.1)
 
     def get_heading_quaternion_radians(self):
