@@ -10,6 +10,7 @@ class PIDController():
         self.kd = 0
         self.previous_error = 0
         self.integral_error = 0
+        self.debug = True  # activar/desactivar prints
 
 
     def control(self, target):
@@ -32,6 +33,16 @@ class PIDController():
         self.integral_error = integral_error
 
         w = current_error * self.kp + differential_error * self.kd + integral_error * self.ki
+        if self.debug:
+            try:
+                print(
+                    f"PID | lat={current_point.latitude:.6f} lon={current_point.longitude:.6f} "
+                    f"target_bearing={target_theta:.3f} heading={current_heading:.3f} "
+                    f"err={current_error:.3f} derr={differential_error:.3f} ierr={self.integral_error:.3f} "
+                    f"speed={self.speed:.3f} w={w:.3f}"
+                )
+            except Exception:
+                pass
 
         return self.speed, w
 
