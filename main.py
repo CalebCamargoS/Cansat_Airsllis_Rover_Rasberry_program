@@ -77,7 +77,7 @@ def main():
     controller = PIDController(robot)
 
  
-    target = SphericalPoint(-12.02460, -77.047482)
+    target = SphericalPoint(39.5340208, -119.81502983)
     rover_manager = RoverManager(robot, controller, target)
     calibration=Calibration(robot)
     tasks=["sensorCalibration",
@@ -86,7 +86,7 @@ def main():
            "GPSControl",
            "CamaraControl"]
     
-    currently_task=tasks[0]
+    currently_task=tasks[2]
     epoch = 0
     secondary_started = False
     secondary_proc = None
@@ -213,7 +213,7 @@ def main():
             sensors_data = calibration.get_values()
             flat = flatten_dict(sensors_data)
             # Excluir claves que contienen 'encoder' (singular o plural)
-            filtered = [(k, v) for k, v in flat if 'encoder' not in k.lower()]
+            filtered = [(k, v) for k, v in flat if 'encoders' not in k.lower()]
             values = [truncate_value(k, v) for k, v in filtered]
             str_values = [str(v) for v in values]
             csv_payload = ','.join(str_values)

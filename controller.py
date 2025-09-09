@@ -4,7 +4,7 @@ class PIDController():
     def __init__(self, robot):
         self.robot = robot
         self.speed = 0.425
-        self.kp = 5
+        self.kp = 0.8
         self.ki = 0
         self.kd = 0
         self.previous_error = 0
@@ -32,17 +32,17 @@ class PIDController():
         w = current_error * self.kp + differential_error * self.kd + integral_error * self.ki
 
         # Improved debug print block
-        print("\n" + "-"*36)
-        print(f"[CONTROL] Current GPS:      lat={current_point.latitude:.6f}, lon={current_point.longitude:.6f}")
-        print(f"[CONTROL] Target bearing:   {math.degrees(target_theta):.2f}° ({target_theta:.3f} rad)")
-        print(f"[CONTROL] Robot heading:    {math.degrees(current_heading):.2f}° ({current_heading:.3f} rad)")
-        print(f"[CONTROL] Heading error:    {math.degrees(u_theta):.2f}° ({u_theta:.3f} rad)")
-        print(f"[CONTROL] PID error:        {current_error:.3f}")
-        print(f"[CONTROL] Differential err: {differential_error:.3f}")
-        print(f"[CONTROL] Integral error:   {integral_error:.3f}")
-        print(f"[CONTROL] PID output (w):   {w:.3f}")
-        print(f"[CONTROL] Calibration:      {self.robot.bno055.get_calibration_status()}")
-        print("-"*36 + "\n")
+        #print("\n" + "-"*36)
+        #print(f"[CONTROL] Current GPS:      lat={current_point.latitude:.6f}, lon={current_point.longitude:.6f}")
+        #print(f"[CONTROL] Target bearing:   {math.degrees(target_theta):.2f}° ({target_theta:.3f} rad)")
+        #print(f"[CONTROL] Robot heading:    {math.degrees(current_heading):.2f}° ({current_heading:.3f} rad)")
+        #print(f"[CONTROL] Heading error:    {math.degrees(u_theta):.2f}° ({u_theta:.3f} rad)")
+        #print(f"[CONTROL] PID error:        {current_error:.3f}")
+        #print(f"[CONTROL] Differential err: {differential_error:.3f}")
+        #print(f"[CONTROL] Integral error:   {integral_error:.3f}")
+        #print(f"[CONTROL] PID output (w):   {w:.3f}")
+        #print(f"[CONTROL] Calibration:      {self.robot.bno055.get_calibration_status()}")
+        #print("-"*36 + "\n")
 
         return self.speed, w
 
