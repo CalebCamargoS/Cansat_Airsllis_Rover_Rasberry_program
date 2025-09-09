@@ -83,14 +83,14 @@ class RoverManager():
         w = max(min(w, max_w), -max_w)
 
         #print("\n" + "="*36)
-        #print(f"[CONTROL] Max wheel speed allowed: {self.robot.max_left_wheel_speed}")
-        #print(f"[CONTROL] Linear speed (v):        {v:.3f} m/s")
-        #print(f"[CONTROL] Max angular control (w): {max_w:.3f} rad/s")
-        #print(f"[CONTROL] Angular control (w):     {w:.3f} rad/s")
+        print(f"[CONTROL] Max wheel speed allowed: {self.robot.max_left_wheel_speed}")
+        print(f"[CONTROL] Linear speed (v):        {v:.3f} m/s")
+        print(f"[CONTROL] Max angular control (w): {max_w:.3f} rad/s")
+        print(f"[CONTROL] Angular control (w):     {w:.3f} rad/s")
 
         left_speed, right_speed = self.unicycle_to_differential(v, w)
 
-        #print(f"[DIFF]   Raw wheel speeds:   L={left_speed:.3f} rad/s, R={right_speed:.3f} rad/s")
+        print(f"[DIFF]   Raw wheel speeds:   L={left_speed:.3f} rad/s, R={right_speed:.3f} rad/s")
         max_wheel = max(abs(left_speed), abs(right_speed))
         if max_wheel > self.robot.max_speed:
             scale = self.robot.max_speed / max_wheel
