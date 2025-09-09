@@ -100,35 +100,21 @@ class GPS:
 
 
 if __name__ == '__main__':
-    gps = GPS(port="/dev/serial0")  
-
-    #print("Reading GPS data... (Ctrl+C to stop)")
-    reference_point = None
-
-    while True:
-        try:
-            point, altitude = gps.read()
-            #print("(lat,long):","(",point.latitude,",",point.longitude,")")
-            """
-            if reference_point is None:
-                # Primer punto como referencia
-                reference_point = SphericalPoint(point.latitude, point.longitude)
-                ref_alt = altitude
-                print(f"Reference set at Lat={point.latitude:.7f}, Lon={point.longitude:.7f}, Alt={altitude:.2f}m")
-                continue
-            
-            # Convertir a coordenadas locales ENU respecto al punto inicial
-            enu = point.toENU(reference_point)
-            x, y, z = enu[0], enu[1], (altitude - ref_alt)  # z = diferencia de altura
-
-            msg = f"Local ENU -> x={x:.2f} m (East), y={y:.2f} m (North), z={z:.2f} m (Up)"
-            print(msg)
-
+    gps = GPS(port="/dev/serial0")
+    gps.debug = True  # activar logs internos si quieres
+    print("=== Test GPS (Ctrl+C para salir) ===")
+    print("Mostrando última muestra válida actualizada por el hilo (puede tardar hasta tener fix)...")
+    try:
+        while True:
+            lp = gps.last_point
+            alt = gps.last_alt
+            print(f"LAST -> lat={lp.latitude:.6f} lon={lp.longitude:.6f} alt={alt:.1f}")
+            # Si quieres forzar una lectura inmediata adicional (bloqueante hasta GGA) descomenta:
+            # p, a = gps.read()
+            # print(f"READ -> lat={p.latitude:.6f} lon={p.longitude:.6f} alt={a:.1f}")
             time.sleep(1)
-            """
-        except KeyboardInterrupt:
-            print("\nStopped by user.")
-            break
-        except Exception as e:
-            print("Error:", e)
+    except KeyboardInterrupt:
+        print("\nFin prueba GPS")
+    finally:
+        gps.stop()
             
