@@ -91,6 +91,8 @@ def main():
     secondary_started = False
     secondary_proc = None
     try:
+        # Para detección de aterrizaje por baja aceleración
+        low_accel_start_time = None
         # === Reference altitude measurement ===
         N_REF = 5
         bme_altitudes = []
@@ -162,10 +164,16 @@ def main():
                         all(a is not None for a in lin_accel) and
                         all(abs(a) < epsilon for a in lin_accel)
                     ):
-                        cond_accel = True
-                if cond_accel:
-                    print("Landing detected (low acceleration) → Switching to nicrom")
-                    currently_task = "nicrom"
+                        # Si ya estábamos en baja aceleración, comprobar tiempo
+                        if low_accel_start_time is None:
+                            low_accel_start_time = time.time()
+                        elif time.time() - low_accel_start_time >= 30:
+                            print("Landing detected (low acceleration for 30s) → Switching to nicrom")
+                            currently_task = "nicrom"
+                            low_accel_start_time = None
+                    else:
+                        # Si la aceleración sube, reiniciar temporizador
+                        low_accel_start_time = None
 
             elif currently_task == "nicrom":
                 print("Activating nicrom")
