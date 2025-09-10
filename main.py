@@ -86,7 +86,7 @@ def main():
            "GPSControl",
            "CamaraControl"]
     
-    currently_task=tasks[0]
+    currently_task=tasks[2]
     epoch = 0
     secondary_started = False
     secondary_proc = None
@@ -168,11 +168,12 @@ def main():
                     currently_task = "nicrom"
 
             elif currently_task == "nicrom":
-                #print("Activating nicrom")
-                #nicrom.on()
-                #time.sleep(5)
-                #nicrom.off()
-                #print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
+                print("Activating nicrom")
+                nicrom.on()
+                time.sleep(10)
+                nicrom.off()
+                print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
+                time.sleep(10)
                 # Calibrate sensors (as before)
                 """
                 sensors_data = calibration.get_values()
