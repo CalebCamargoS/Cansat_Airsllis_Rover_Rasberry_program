@@ -50,8 +50,11 @@ def main():
     right_motor = Motor(RIGHT_MOTOR_INPUT[0], RIGHT_MOTOR_INPUT[1])
 
     # === Nicrom GPIO ===
-    
     nicrom = OutputDevice(17, active_high=True, initial_value=False)
+
+    # === LEDs indicadores ===
+    led1 = OutputDevice(23, active_high=True, initial_value=False)  # LED indicador 1
+    led2 = OutputDevice(24, active_high=True, initial_value=False)  # LED indicador 2
 
     # === Encoders ===
     LEFT_ENCODER_INPUT = {'hall_sensor_A':27, 'hall_sensor_B': 22, 'ticks_per_revolution': 985}
@@ -94,7 +97,7 @@ def main():
         # Para detección de aterrizaje por baja aceleración
         low_accel_start_time = None
         # === Reference altitude measurement ===
-        N_REF = 5
+        N_REF = 10
         bme_altitudes = []
         print("Measuring reference altitude (10 samples)...")
         for _ in range(N_REF):
@@ -109,6 +112,9 @@ def main():
         
         while True:
             if currently_task == "sensorCalibration":
+                # leds on
+                led1.on()
+                led2.on()
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
                 for key, value in sensors_data.items():
@@ -127,7 +133,7 @@ def main():
                 if bme_current is not None:
                     bme_diff = bme_current - alt_ref_bme
                     print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) > 0 :
+                    if abs(bme_diff) > 100 :
                         cond_bme = True
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
@@ -142,6 +148,8 @@ def main():
                             print(f"[ERROR] No se pudo iniciar lora_emisor.py: {e}")
                     
             elif currently_task == "inAir":
+                led1.off()
+                led2.on()
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
                 for key, value in sensors_data.items():
@@ -154,7 +162,7 @@ def main():
                 print("===============================\n")
                 # Check for landing: only low linear acceleration (BNO055)
                 cond_accel = False
-                epsilon = -10
+                epsilon = 0.2
                 lin_accel = None
                 if "bno055" in sensors_data and "linear_acceleration" in sensors_data["bno055"]:
                     lin_accel = sensors_data["bno055"]["linear_acceleration"]
@@ -176,10 +184,14 @@ def main():
                         low_accel_start_time = None
 
             elif currently_task == "nicrom":
+                led1.on()
+                led2.off()
                 print("Activating nicrom")
                 nicrom.on()
-                time.sleep(35)
+                time.sleep(40)
                 nicrom.off()
+                led1.off()
+                led2.off()
                 print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
                 time.sleep(5)
                 # Calibrate sensors (as before)

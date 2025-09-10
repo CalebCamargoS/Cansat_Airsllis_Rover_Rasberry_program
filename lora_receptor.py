@@ -167,6 +167,10 @@ def parse_payload_to_record(payload: str):
     return record
 
 if __name__ == "__main__":
+    # Reiniciar el archivo CSV y escribir encabezado
+    with open(OUTPUT_DB, 'w', encoding='utf-8', newline='') as f:
+        f.write(','.join(CSV_HEADER) + '\n')
+
     with serial.Serial(PORT, BAUD, timeout=0.15) as s:
         # Asegura que NO está en RX antes de configurar
         at(s, "AT+PRECV=0", show=False)

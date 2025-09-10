@@ -45,7 +45,7 @@ with serial.Serial(PORT, BAUD, timeout=0.2) as s:
                 if lines:
                     payload = lines[-1].strip()
                     # Limitar longitud de seguridad (ajusta según SF si quieres)
-                    max_len = 160
+                    max_len = 240
                     if len(payload) > max_len:
                         payload = payload[:max_len]
                     psend(s, payload)
