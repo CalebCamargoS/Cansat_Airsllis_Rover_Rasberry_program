@@ -127,7 +127,7 @@ def main():
                 if bme_current is not None:
                     bme_diff = bme_current - alt_ref_bme
                     print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) > 6 :
+                    if abs(bme_diff) > 0 :
                         cond_bme = True
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
@@ -154,7 +154,7 @@ def main():
                 print("===============================\n")
                 # Check for landing: only low linear acceleration (BNO055)
                 cond_accel = False
-                epsilon = 0.2
+                epsilon = -10
                 lin_accel = None
                 if "bno055" in sensors_data and "linear_acceleration" in sensors_data["bno055"]:
                     lin_accel = sensors_data["bno055"]["linear_acceleration"]
