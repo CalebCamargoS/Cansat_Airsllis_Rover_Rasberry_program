@@ -93,6 +93,32 @@ class Robot():
         timeout: tiempo máximo de calibración en segundos
         """
         print("\n[CALIBRATION] Iniciando calibración activa del BNO055...")
+        self.update_speed_normalize(speed,speed)
+        time.sleep(5)
+        self.update_speed_normalize(0,speed)
+        time.sleep(5)
+        self.update_speed_normalize(speed,0)
+        time.sleep(3)
+        self.update_speed_normalize(-speed,-speed)
+        time.sleep(3)
+        self.update_speed_normalize(speed,speed)
+        time.sleep(1)
+        self.update_speed_normalize(speed, speed*0.3)
+        time.sleep(6)
+        self.update_speed_normalize(0, 0)
+        time.sleep(1)
+        self.update_speed_normalize(speed*0.3, speed)
+        time.sleep(6)
+        self.update_speed_normalize(0, 0)
+        time.sleep(1)
+        t8_start = time.time()
+        while time.time() - t8_start < 10:
+            self.update_speed_normalize(speed, speed*0.3)
+            time.sleep(2)
+            self.update_speed_normalize(speed*0.3, speed)
+            time.sleep(2)
+        self.update_speed_normalize(0, 0)
+        time.sleep(1)
         start_time = time.time()
 
         # Bucle principal de calibración

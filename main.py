@@ -167,7 +167,7 @@ def main():
                         # Si ya estábamos en baja aceleración, comprobar tiempo
                         if low_accel_start_time is None:
                             low_accel_start_time = time.time()
-                        elif time.time() - low_accel_start_time >= 30:
+                        elif time.time() - low_accel_start_time >= 10:
                             print("Landing detected (low acceleration for 30s) → Switching to nicrom")
                             currently_task = "nicrom"
                             low_accel_start_time = None
@@ -178,10 +178,10 @@ def main():
             elif currently_task == "nicrom":
                 print("Activating nicrom")
                 nicrom.on()
-                time.sleep(40)
+                time.sleep(35)
                 nicrom.off()
                 print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
-                time.sleep(10)
+                time.sleep(5)
                 # Calibrate sensors (as before)
                 """
                 sensors_data = calibration.get_values()
