@@ -113,7 +113,6 @@ def main():
         while True:
             if currently_task == "sensorCalibration":
                 # leds on
-                led1.on()
                 led2.on()
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
@@ -148,8 +147,7 @@ def main():
                             print(f"[ERROR] No se pudo iniciar lora_emisor.py: {e}")
                     
             elif currently_task == "inAir":
-                led1.off()
-                led2.on()
+                led2.off()
                 sensors_data = calibration.get_values()
                 print("\n=== SENSOR CALIBRATION DATA ===")
                 for key, value in sensors_data.items():
@@ -184,13 +182,12 @@ def main():
                         low_accel_start_time = None
 
             elif currently_task == "nicrom":
-                led1.on()
-                led2.off()
+                
+                led2.on()
                 print("Activating nicrom")
                 nicrom.on()
                 time.sleep(40)
                 nicrom.off()
-                led1.off()
                 led2.off()
                 print("Nicrom deactivated. Proceeding to sensor calibration and GPSControl.")
                 time.sleep(5)
