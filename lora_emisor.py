@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 import serial, binascii
 import time
@@ -50,6 +49,7 @@ with serial.Serial(PORT, BAUD, timeout=0.2) as s:
                     if len(payload) > max_len:
                         payload = payload[:max_len]
                     psend(s, payload)
+                    print(f"Enviado: {payload}")
             time.sleep(1)
         except KeyboardInterrupt:
             break
