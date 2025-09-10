@@ -5,7 +5,7 @@ import os
 from gpiozero import OutputDevice
 # --- Configuración RAK3172 ---
 PORT = "/dev/serial0"
-BAUD = 115200
+BAUD = 9600
 P2P  = "915000000:7:0:0:16:20"   # Igual que en el receptor
 
 # --- Funciones ---
