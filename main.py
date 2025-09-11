@@ -1,3 +1,4 @@
+
 import time
 import subprocess
 from gpiozero import Motor
@@ -80,7 +81,7 @@ def main():
     controller = PIDController(robot)
 
  
-    target = SphericalPoint(39.533679, -119.814952)
+    target = SphericalPoint(40.86808, -119.10431)
     rover_manager = RoverManager(robot, controller, target)
     calibration=Calibration(robot)
     tasks=["sensorCalibration",
@@ -132,7 +133,7 @@ def main():
                 if bme_current is not None:
                     bme_diff = bme_current - alt_ref_bme
                     print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) > 100 :
+                    if abs(bme_diff) > 2 :
                         cond_bme = True
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
@@ -228,12 +229,12 @@ def main():
                 epoch += 1
                 current_point = robot.gps.last_point 
                 distancia = np.linalg.norm(current_point.toENU(target))
-                """
+                
                 if distancia <= 5:
                     print("Objetivo alcanzado (dentro de 5 metros)")
                     robot.stop()
                     currently_task = tasks[0]
-                """
+                
                 #elapsed = time.time() - start
                 #time.sleep(max(0, dt - elapsed))
                 time.sleep(0.01)
