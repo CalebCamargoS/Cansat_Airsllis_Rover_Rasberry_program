@@ -226,8 +226,8 @@ def main():
                 #gps_enabled = (epoch > 0 and (epoch % 100 == 0))
                 rover_manager.execute_with_filter(gps_enabled=False)
                 epoch += 1
-                #current_point, _ = robot.gps.read()
-                #distancia = np.linalg.norm(current_point.toENU(target))
+                current_point = robot.gps.last_point 
+                distancia = np.linalg.norm(current_point.toENU(target))
                 """
                 if distancia <= 5:
                     print("Objetivo alcanzado (dentro de 5 metros)")
