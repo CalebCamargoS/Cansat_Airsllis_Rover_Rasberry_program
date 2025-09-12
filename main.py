@@ -81,7 +81,7 @@ def main():
     controller = PIDController(robot)
 
  
-    target = SphericalPoint(40.86808, -119.10431)
+    target = SphericalPoint(40.87894444, -119.12336111)
     rover_manager = RoverManager(robot, controller, target)
     calibration=Calibration(robot)
     tasks=["sensorCalibration",
@@ -90,7 +90,7 @@ def main():
            "GPSControl",
            "CamaraControl"]
     
-    currently_task=tasks[0]
+    currently_task=tasks[2]
     epoch = 0
     secondary_started = False
     secondary_proc = None
