@@ -90,7 +90,7 @@ def main():
            "GPSControl",
            "CamaraControl"]
     
-    currently_task=tasks[2]
+    currently_task=tasks[0]
     epoch = 0
     secondary_started = False
     secondary_proc = None
@@ -133,7 +133,7 @@ def main():
                 if bme_current is not None:
                     bme_diff = bme_current - alt_ref_bme
                     print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) > 2 :
+                    if abs(bme_diff) > 100 :
                         cond_bme = True
                 if cond_bme:
                     print("Launch detected → Switching to inAir")
@@ -230,7 +230,7 @@ def main():
                 current_point = robot.gps.last_point 
                 distancia = np.linalg.norm(current_point.toENU(target))
                 
-                if distancia <= 5:
+                if distancia <= 4:
                     print("Objetivo alcanzado (dentro de 5 metros)")
                     robot.stop()
                     currently_task = tasks[0]
