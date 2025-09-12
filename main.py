@@ -99,17 +99,19 @@ def main():
         low_accel_start_time = None
         # === Reference altitude measurement ===
         N_REF = 10
-        bme_altitudes = []
-        print("Measuring reference altitude (10 samples)...")
-        for _ in range(N_REF):
-            values = calibration.get_values()
-            bme_alt = values["environment"]["altitude_bme280"]
-            if bme_alt is not None:
-                bme_altitudes.append(bme_alt)
-            time.sleep(0.1)  # 100 ms between samples
-            print(".")
-        alt_ref_bme = np.mean(bme_altitudes) if bme_altitudes else 0
-        print(f"Reference BME280 altitude (mean of {len(bme_altitudes)}): {alt_ref_bme:.2f} m")
+        gps_altitudes = []
+        print("Measuring reference GPS altitude (10 samples)...")
+        while len(gps_altitudes) < N_REF:
+            alt = robot.gps.last_alt
+            if alt is not None and alt != 0.0:
+                gps_altitudes.append(alt)
+                print(f"GPS sample {len(gps_altitudes)}/{N_REF}: {alt:.2f} m")
+            else:
+                print("Esperando fix GPS...")
+            time.sleep(0.5)  # 500 ms entre muestras
+        alt_ref_gps = np.mean(gps_altitudes)
+        print(f"Reference GPS altitude (mean of {len(gps_altitudes)}): {alt_ref_gps:.2f} m")
+        
         
         while True:
             if currently_task == "sensorCalibration":
@@ -126,16 +128,16 @@ def main():
                         print(f"{key}: {value}")
                 print("===============================\n")
 
-                # Check for launch: BME280 altitude >10m above reference
-                cond_bme = False
-                bme_current = sensors_data["environment"].get("altitude_bme280")
-                bme_diff = None
-                if bme_current is not None:
-                    bme_diff = bme_current - alt_ref_bme
-                    print(f"[Launch check] BME280 altitude diff: {bme_diff:.2f} m (current: {bme_current:.2f}, ref: {alt_ref_bme:.2f})")
-                    if abs(bme_diff) > 100 :
-                        cond_bme = True
-                if cond_bme:
+                # Check for launch: GPS altitude >100m above reference
+                cond_gps = False
+                gps_current = robot.gps.last_alt
+                gps_diff = None
+                if gps_current is not None and gps_current != 0.0:
+                    gps_diff = gps_current - alt_ref_gps
+                    print(f"[Launch check] GPS altitude diff: {gps_diff:.2f} m (current: {gps_current:.2f}, ref: {alt_ref_gps:.2f})")
+                    if abs(gps_diff) > 100:
+                        cond_gps = True
+                if cond_gps:
                     print("Launch detected → Switching to inAir")
                     currently_task = "inAir"
                     
@@ -145,8 +147,7 @@ def main():
                             secondary_started = True
                             print("[INFO] Proceso secundario 'lora_emisor.py' iniciado en paralelo.")
                         except Exception as e:
-                            print(f"[ERROR] No se pudo iniciar lora_emisor.py: {e}")
-                    
+                            print(f"[ERROR] No se pudo iniciar lora_emisor.py: {e}")    
             elif currently_task == "inAir":
                 led2.off()
                 sensors_data = calibration.get_values()
